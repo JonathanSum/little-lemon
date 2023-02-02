@@ -5,6 +5,7 @@ import * as React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import headerImage from "./assets/title.png";
+import HomeScreen from "./screens/HomeScreen";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -19,19 +20,28 @@ export default function App() {
   );
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        {state.isOnboardingCompleted ? (
-          // Onboarding completed, user is signed in
+      {state.isOnboardingCompleted ? (
+        // Onboarding completed, user is signed in
+        <Stack.Navigator initialRouteName="Home">
           <Stack.Screen
             name="Profile"
             component={ProfileScreen}
             options={{ headerTitle: (props) => <LogoTitle {...props} /> }}
           />
-        ) : (
-          // User is NOT signed in
+          <Stack.Screen
+            name="Home"
+            component={HomeScreen}
+            options={{ headerTitle: (props) => <LogoTitle {...props} /> }}
+          />
+        </Stack.Navigator>
+      ) : (
+        // <Stack.Screen name="Home" component={HomeScreen} />
+
+        // User is NOT signed in
+        <Stack.Navigator>
           <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-        )}
-      </Stack.Navigator>
+        </Stack.Navigator>
+      )}
     </NavigationContainer>
   );
 }
