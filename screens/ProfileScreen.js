@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Button,
   SafeAreaView,
   StyleSheet,
   TextInput,
@@ -10,31 +11,84 @@ import {
   Image,
   ScrollView,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import headerImage from "../assets/title.png";
 import { MaskedTextInput } from "react-native-mask-text";
+import headerImage from "../assets/title.png";
 const TextInputExample = () => {
-  const [fN, onChangeFN] = React.useState("");
-  const [lN, onChangeLN] = React.useState("");
-  const [email, onChangeEmail] = React.useState("");
+  const [image, setImage] = React.useState(null);
+  const [fN, onChangeFN] = React.useState("Trilly");
+  const [lN, onChangeLN] = React.useState("Doe");
+  const [email, onChangeEmail] = React.useState("Tillydoe@example.com");
 
-  const [phone, onChangePhone] = React.useState("");
+  const [phone, onChangePhone] = React.useState("(217) 555-0113");
 
-  const [order, setOrder] = React.useState(false);
-  const [pWChange, setPWChange] = React.useState(false);
-  const [special, setSpecial] = React.useState(false);
-  const [news, setNews] = React.useState(false);
-  const [toggleCheckBox, setToggleCheckBox] = React.useState(false);
+  const [order, setOrder] = React.useState(true);
+  const [pWChange, setPWChange] = React.useState(true);
+  const [special, setSpecial] = React.useState(true);
+  const [news, setNews] = React.useState(true);
+  const [toggleCheckBox, setToggleCheckBox] = React.useState(true);
   const [state, setState] = React.useState({
     isLoading: true,
   });
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
 
   return (
     <>
       <Text style={[styles.headerText, { paddingTop: 60 }]}>
         Personal information
       </Text>
-      <Text style={[styles.text, { paddingTop: 20 }]}>First name</Text>
+      <Text
+        style={{
+          color: "grey",
+          fontSize: 18,
+        }}
+      >
+        Avatar
+      </Text>
+      <View style={styles.buttonGroup}>
+        <TouchableOpacity style={styles.image} onPress={pickImage}>
+          {!image ? (
+            <Image style={styles.image} source={{ uri: image }} />
+          ) : (
+            <>
+              <Text style={{ fontSize: 20 }}>
+                {fN[0]}
+                {lN[0]}
+              </Text>
+            </>
+          )}
+          {/* <Image style={styles.image} source={{ uri: image }} /> */}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.buttonChange}
+          onPress={() => Alert.alert("Simple Button pressed")}
+        >
+          <Text style={styles.buttonTextChange}>Change</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.buttonRemove}
+          onPress={() => Alert.alert("Simple Button pressed")}
+        >
+          <Text style={styles.buttonTextRemove}>Remove</Text>
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.text}>First name</Text>
       <TextInput
         style={[styles.input, styles.text]}
         onChangeText={onChangeFN}
@@ -60,18 +114,21 @@ const TextInputExample = () => {
         onChangeText={(text, rawText) => {
           onChangePhone(text);
         }}
-        value={""}
+        defaultValue={phone}
         style={styles.phoneInput}
       />
-      <Text style={styles.bottomTitle}>Email notifications</Text>
+      <Text style={[styles.bottomTitle, { paddingBottom: 15 }]}>
+        Email notifications
+      </Text>
       <View style={styles.checkContainer}>
         <BouncyCheckbox
           onPress={(isChecked) => {
             setOrder(isChecked);
           }}
           innerIconStyle={{
-            borderRadius: 0, // to make it a little round increase the value accordingly
+            borderRadius: 0,
           }}
+          fillColor="#495E57"
         />
         <Text style={styles.label}>Order statuses</Text>
       </View>
@@ -83,6 +140,7 @@ const TextInputExample = () => {
           innerIconStyle={{
             borderRadius: 0, // to make it a little round increase the value accordingly
           }}
+          fillColor="#495E57"
         />
         <Text style={styles.label}>Password changes</Text>
       </View>
@@ -94,10 +152,11 @@ const TextInputExample = () => {
           innerIconStyle={{
             borderRadius: 0, // to make it a little round increase the value accordingly
           }}
+          fillColor="#495E57"
         />
         <Text style={styles.label}>Special offers</Text>
       </View>
-      <View style={styles.checkContainer}>
+      <View style={[styles.checkContainer, { marginBottom: 0 }]}>
         <BouncyCheckbox
           onPress={(isChecked) => {
             setOrder(isChecked);
@@ -105,6 +164,7 @@ const TextInputExample = () => {
           innerIconStyle={{
             borderRadius: 0, // to make it a little round increase the value accordingly
           }}
+          fillColor="#495E57"
         />
         <Text style={styles.label}>Newsletter</Text>
       </View>
@@ -147,10 +207,52 @@ const ProfileScreen = () => {
   );
 };
 const styles = StyleSheet.create({
-  image: {},
+  image: {
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 95,
+    height: 95,
+    backgroundColor: "#fff",
+    borderRadius: 50,
+    marginRight: 5,
+    marginLeft: 4.5,
+  },
+  label: { fontSize: 15 },
+  checkbox: { backgroundColor: "#495E57" },
+  //Top two buttons started
+
+  buttonTopGroup: {
+    flexDirection: "row",
+  },
+  buttonChange: {
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#495E57",
+    marginTop: 50,
+    marginHorizontal: 10,
+    marginBottom: 50,
+    height: 50,
+    borderRadius: 10,
+    width: 100,
+  },
+  buttonRemove: {
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "white",
+    marginTop: 50,
+    marginBottom: 50,
+    marginHorizontal: 10,
+    height: 50,
+    width: 100,
+    borderColor: "#495E57",
+    borderWidth: 1,
+  },
+
+  //Top two buttons ended
   buttonGroup: {
     flexDirection: "row",
-    marginBottom: 50,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -176,9 +278,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: 155,
   },
+  buttonTextChange: { fontSize: 18, color: "white" },
+  buttonTextRemove: { fontSize: 18, color: "grey" },
   buttonTextDiscard: { fontSize: 18, color: "#9596AA" },
   buttonTextSave: { fontSize: 18, color: "white" },
   bottomTitle: {
+    fontWeight: "bold",
     fontSize: 20,
     marginVertical: 14,
   },
@@ -246,6 +351,7 @@ const styles = StyleSheet.create({
   },
   checkContainer: {
     flexDirection: "row",
+    marginBottom: 15,
   },
 });
 export default ProfileScreen;
