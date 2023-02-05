@@ -8,22 +8,19 @@ import {
   View,
   Alert,
   Image,
+  ScrollView,
 } from "react-native";
 import headerImage from "../assets/title.png";
 const TextInputExample = () => {
-  const [text, onChangeText] = React.useState("");
-  const [number, onChangeNumber] = React.useState("");
+  const [email, onChangeEmail] = React.useState("");
+  const [fN, onChangeFN] = React.useState("");
+  const [state, setState] = React.useState({
+    isLoading: true,
+  });
 
   return (
-    <SafeAreaView
-      style={[
-        styles.container,
-        {
-          flexDirection: "column",
-        },
-      ]}
-    >
-      <View style={[{ flex: 0.15, backgroundColor: "red" }, styles.header]}>
+    <>
+      <View style={[{ flex: 0.15 }, styles.header]}>
         <Image style={styles.image} source={headerImage} />
       </View>
       <View
@@ -40,16 +37,15 @@ const TextInputExample = () => {
         <Text style={[styles.text, { paddingTop: 120 }]}>First Name</Text>
         <TextInput
           style={[styles.input, styles.text]}
-          onChangeText={onChangeText}
-          value={text}
+          onChangeText={onChangeFN}
+          value={fN}
         />
         <Text style={[styles.text]}>Email</Text>
         <TextInput
           style={[styles.input, styles.text]}
-          onChangeText={onChangeNumber}
-          value={number}
+          onChangeText={onChangeEmail}
+          value={email}
           placeholder=""
-          keyboardType="numeric"
         />
       </View>
       <View
@@ -67,12 +63,23 @@ const TextInputExample = () => {
           <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </>
   );
 };
 
 const Onboarding = () => {
-  return <TextInputExample />;
+  return (
+    <SafeAreaView
+      style={[
+        styles.container,
+        {
+          flexDirection: "column",
+        },
+      ]}
+    >
+      <TextInputExample />
+    </SafeAreaView>
+  );
 };
 const styles = StyleSheet.create({
   image: {},
@@ -126,6 +133,7 @@ const styles = StyleSheet.create({
   },
   main: {
     backgroundColor: "#CBD2D9",
+    paddingBottom: 150,
   },
 });
 export default Onboarding;
