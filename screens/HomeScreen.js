@@ -7,7 +7,6 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
-import * as SQLite from "expo-sqlite";
 import {
   createTable,
   filterByQueryAndCategories,
@@ -19,18 +18,21 @@ import { getSectionListData, useUpdateEffect } from "../utils";
 
 const API_URL =
   "https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json";
-const db = SQLite.openDatabase("little_lemon");
 
 const HomeScreen = () => {
   const [data, setData] = React.useState([]);
 
   React.useEffect(() => {
+    // let T1 = getMenuItems();
+    // console.log(T1);
     //This part is a function for fetching and storing data
     (async () => {
       try {
+        console.log("Yes?01");
         await createTable();
-
-        let menuItems = await getMenuItems();
+        console.log("Yes?11");
+        let menuItems = getMenuItems();
+        console.log("Yes?12");
         if (!menuItems.length) {
           const response = await fetch(API_URL);
           const json = await response.json();
@@ -38,6 +40,7 @@ const HomeScreen = () => {
             ...item,
             category: item.category,
           }));
+          console.log(menuItems);
           // Storing into database
           saveMenuItems(menuItems);
         }
