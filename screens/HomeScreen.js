@@ -21,10 +21,11 @@ import {
 import debounce from "lodash.debounce";
 import { getSectionListData, useUpdateEffect } from "../utils";
 import { Searchbar } from "react-native-paper";
-
+import Filters from "./Filters";
+import { useHeaderHeight } from "@react-navigation/elements";
 const API_URL =
   "https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json";
-const sections = ["starters", "main", "desserts", "drinks", "special"];
+const sections = ["starters", "main", "desserts", "drinks"];
 const HomeScreen = () => {
   const [data, setData] = React.useState([]);
   const [searchBarText, setSearchBarText] = React.useState("");
@@ -58,7 +59,7 @@ const HomeScreen = () => {
         // const sectionListData = getSectionListData(menuItems);
         // // console.log(JSON.stringify(sectionListData));
         // setData(sectionListData);
-        console.log(menuItems);
+
         setData(menuItems);
       } catch (e) {
         console.error(e.message);
@@ -141,9 +142,10 @@ const HomeScreen = () => {
       image={item.image}
     />
   );
-
+  const height = useHeaderHeight();
   return (
     <KeyboardAvoidingView
+      keyboardVerticalOffset={height - 164}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.searchContainer}
     >
@@ -193,38 +195,11 @@ const HomeScreen = () => {
 
           <View style={{ flex: 0.2, backgroundColor: "white" }}>
             <Text style={styles.deliveryHeaderText}>ORDER FOR DELIVERY!</Text>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                padding: 15,
-              }}
-            >
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => Alert.alert("Simple Button pressed")}
-              >
-                <Text style={styles.buttonText}>Starters</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => Alert.alert("Simple Button pressed")}
-              >
-                <Text style={styles.buttonText}>Main</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => Alert.alert("Simple Button pressed")}
-              >
-                <Text style={styles.buttonText}>Desserts</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => Alert.alert("Simple Button pressed")}
-              >
-                <Text style={styles.buttonText}>Drinks</Text>
-              </TouchableOpacity>
-            </View>
+            <Filters
+              selections={filterSelections}
+              onChange={handleFiltersChange}
+              sections={sections}
+            />
           </View>
           <View
             style={{

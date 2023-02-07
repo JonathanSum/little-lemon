@@ -20,7 +20,6 @@ export async function getMenuItems() {
   return new Promise((resolve) => {
     db.transaction((tx) => {
       tx.executeSql("select * from menuItems", [], (_, { rows }) => {
-        // console.log(rows);
         resolve(rows._array);
       });
     });
