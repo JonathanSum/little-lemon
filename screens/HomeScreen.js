@@ -181,12 +181,12 @@ const HomeScreen = () => {
 
             <Searchbar
               placeholder="Search"
-              placeholderTextColor="white"
+              placeholderTextColor="#4D625B"
               onChangeText={handleSearchChange}
               value={searchBarText}
               style={styles.searchBarStyle}
-              iconColor="white"
-              inputStyle={{ color: "white" }}
+              iconColor="#4D625B"
+              inputStyle={{ color: "#4D625B" }}
               elevation={0}
             />
           </View>
@@ -249,9 +249,12 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   searchBarStyle: {
     // marginVertical: 24,
-    backgroundColor: "white",
+    backgroundColor: "#EDEFEE",
     shadowRadius: 0,
     shadowOpacity: 0,
+    borderRadius: 10,
+    marginVertical: 10,
+    marginRight: 15,
   },
   container: {
     flex: 1,
@@ -260,7 +263,6 @@ const styles = StyleSheet.create({
     width: 135,
     height: 135,
     resizeMode: "center",
-
     marginTop: 10,
     borderRadius: 20,
     marginLeft: 10,
