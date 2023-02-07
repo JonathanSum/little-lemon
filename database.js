@@ -37,6 +37,8 @@ export function saveMenuItems(menuItems) {
 }
 
 export async function filterByQueryAndCategories(query, activeCategories) {
+  console.log("filtering with query:", query);
+  console.log("filtering with activeCategories:", activeCategories);
   return new Promise((resolve, reject) => {
     if (!query) {
       db.transaction((tx) => {
@@ -46,8 +48,8 @@ export async function filterByQueryAndCategories(query, activeCategories) {
             .join(" or ")}`,
           [],
           (_, { rows }) => {
-            // resolve(rows._array);
-            console.log(rows);
+            resolve(rows._array);
+            // console.log(rows);
           }
         );
       }, reject);
@@ -59,8 +61,8 @@ export async function filterByQueryAndCategories(query, activeCategories) {
             .join(" or ")})`,
           [],
           (_, { rows }) => {
-            // resolve(rows._array);
-            console.log(rows);
+            resolve(rows._array);
+            // console.log(rows);
           }
         );
       }, reject);

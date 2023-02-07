@@ -25,7 +25,7 @@ import Filters from "./Filters";
 import { useHeaderHeight } from "@react-navigation/elements";
 const API_URL =
   "https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json";
-const sections = ["starters", "main", "desserts", "drinks"];
+const sections = ["starters", "mains", "desserts", "drinks"];
 const HomeScreen = () => {
   const [data, setData] = React.useState([]);
   const [searchBarText, setSearchBarText] = React.useState("");
@@ -59,7 +59,7 @@ const HomeScreen = () => {
         // const sectionListData = getSectionListData(menuItems);
         // // console.log(JSON.stringify(sectionListData));
         // setData(sectionListData);
-
+        console.log("menuItems", menuItems);
         setData(menuItems);
       } catch (e) {
         console.error(e.message);
@@ -82,6 +82,7 @@ const HomeScreen = () => {
         );
         // const sectionListData = getSectionListData(menuItems);
         // setData(sectionListData);
+        console.log("filtered", menuItems);
         setData(menuItems);
       } catch (e) {
         console.error(e.message);
@@ -92,12 +93,11 @@ const HomeScreen = () => {
   const lookup = React.useCallback((q) => {
     setQuery(q);
   }, []);
-  const debouncedLookup = React.useMemo(() => {
-    debounce(lookup, 500), [lookup];
-  });
+  const debouncedLookup = React.useMemo(() => debounce(lookup, 500), [lookup]);
+
   const handleSearchChange = (text) => {
     setSearchBarText(text);
-    // debouncedLookup(text);
+    debouncedLookup(text);
   };
   const handleFiltersChange = async (index) => {
     const arrayCopy = [...filterSelections];
