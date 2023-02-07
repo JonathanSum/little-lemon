@@ -20,7 +20,6 @@ import {
 } from "../database";
 import debounce from "lodash.debounce";
 import { getSectionListData, useUpdateEffect } from "../utils";
-import { Searchbar } from "react-native-paper";
 
 const API_URL =
   "https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json";
@@ -143,113 +142,116 @@ const HomeScreen = () => {
   );
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          // Try setting `flexDirection` to `"row"`.
-          flexDirection: "column",
-        },
-      ]}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.searchContainer}
     >
-      <View style={{ flex: 0.48, backgroundColor: "#495E57", paddingLeft: 25 }}>
-        <Text style={styles.HeaderText}>Little Lemon</Text>
-        <View style={{ flexDirection: "row" }}>
-          <View>
-            <Text style={styles.topTextHeader}>Chicago</Text>
-            <Text style={styles.topTextP}>
-              We are a family owned{"\n"}
-              Mediterranean restaurant,{"\n"}
-              focused on traditional{"\n"}
-              recipes served with a{"\n"}
-              modern twist.
-            </Text>
+      <ScrollView>
+        <View
+          style={[
+            styles.container,
+            {
+              // Try setting `flexDirection` to `"row"`.
+              flexDirection: "column",
+            },
+          ]}
+        >
+          <View
+            style={{ flex: 0.48, backgroundColor: "#495E57", paddingLeft: 25 }}
+          >
+            <Text style={styles.HeaderText}>Little Lemon</Text>
+            <View style={{ flexDirection: "row" }}>
+              <View>
+                <Text style={styles.topTextHeader}>Chicago</Text>
+                <Text style={styles.topTextP}>
+                  We are a family owned{"\n"}
+                  Mediterranean restaurant,{"\n"}
+                  focused on traditional{"\n"}
+                  recipes served with a{"\n"}
+                  modern twist.
+                </Text>
+              </View>
+
+              <Image
+                style={styles.titleImage}
+                source={require("../assets/handle.jpg")}
+              />
+            </View>
+            <View style={{ flexDirection: "row" }}>
+              <Image
+                style={styles.search}
+                source={require("../assets/search.jpg")}
+              />
+
+              <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <View style={styles.inner}>
+                  <TextInput
+                    style={styles.inputSearch}
+                    onChangeText={handleSearchChange}
+                    value={searchBarText}
+                    placeholder="Search"
+                  />
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
           </View>
 
-          <Image
-            style={styles.titleImage}
-            source={require("../assets/handle.jpg")}
+          <View style={{ flex: 0.2, backgroundColor: "white" }}>
+            <Text style={styles.deliveryHeaderText}>ORDER FOR DELIVERY!</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                padding: 15,
+              }}
+            >
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => Alert.alert("Simple Button pressed")}
+              >
+                <Text style={styles.buttonText}>Starters</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => Alert.alert("Simple Button pressed")}
+              >
+                <Text style={styles.buttonText}>Main</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => Alert.alert("Simple Button pressed")}
+              >
+                <Text style={styles.buttonText}>Desserts</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => Alert.alert("Simple Button pressed")}
+              >
+                <Text style={styles.buttonText}>Drinks</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View
+            style={{
+              marginHorizontal: 10,
+              borderBottomColor: "black",
+              borderBottomWidth: StyleSheet.hairlineWidth,
+            }}
           />
-        </View>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={styles.searchContainer}
-        >
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <Searchbar
-              placeholder="Search"
-              placeholderTextColor="white"
-              onChangeText={handleSearchChange}
-              value={searchBarText}
-              style={styles.searchBarStyle}
-              iconColor="white"
-              inputStyle={{ color: "white" }}
-              elevation={0}
+          <View style={{ flex: 0.35, backgroundColor: "white" }}>
+            <FlatList
+              data={data}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id}
             />
-          </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
-      </View>
-
-      <View style={{ flex: 0.2, backgroundColor: "white" }}>
-        <Text style={styles.deliveryHeaderText}>ORDER FOR DELIVERY!</Text>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            padding: 15,
-          }}
-        >
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => Alert.alert("Simple Button pressed")}
-          >
-            <Text style={styles.buttonText}>Starters</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => Alert.alert("Simple Button pressed")}
-          >
-            <Text style={styles.buttonText}>Main</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => Alert.alert("Simple Button pressed")}
-          >
-            <Text style={styles.buttonText}>Desserts</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => Alert.alert("Simple Button pressed")}
-          >
-            <Text style={styles.buttonText}>Drinks</Text>
-          </TouchableOpacity>
+          </View>
         </View>
-      </View>
-      <View
-        style={{
-          marginHorizontal: 10,
-          borderBottomColor: "black",
-          borderBottomWidth: StyleSheet.hairlineWidth,
-        }}
-      />
-      <View style={{ flex: 0.35, backgroundColor: "white" }}>
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-        />
-      </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  searchBarStyle: {
-    marginVertical: 24,
-    backgroundColor: "white",
-    shadowRadius: 0,
-    shadowOpacity: 0,
-  },
   container: {
     flex: 1,
   },

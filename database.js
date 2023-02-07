@@ -11,7 +11,7 @@ export async function createTable() {
         );
       },
       reject,
-      resolve
+      resolve //
     );
   });
 }
@@ -20,7 +20,7 @@ export async function getMenuItems() {
   return new Promise((resolve) => {
     db.transaction((tx) => {
       tx.executeSql("select * from menuItems", [], (_, { rows }) => {
-        console.log(rows);
+        // console.log(rows);
         resolve(rows._array);
       });
     });
@@ -28,39 +28,13 @@ export async function getMenuItems() {
 }
 
 export function saveMenuItems(menuItems) {
-  console.log("Yes???");
   db.transaction((tx) => {
     menuItems.map((item) => {
       tx.executeSql(
         `insert into menuItems (description, image, name, price, category) values ("${item.description}", "${item.image}", "${item.name}","${item.price}", "${item.category}");`
       );
-      //   tx.executeSql(
-      //     `insert into menuItems (description, image, name, price, category) values (d1, i1, n1, p1,c1);`
-      //   );
-      //   console.log(`insert into menuItems (description, image, name, price, category) values
-      //     ("${item.description}",
-      //     ${item.image},
-      //     ${item.name},
-      //     ${item.price}),
-      //   ${item.category})`);
-    });
-    // tx.executeSql(
-    //   `insert into menuItems (description, image, name, price) values ${menuItems.map(
-    //     (item) =>
-    //       `('${item.name}',
-    //       '${item.price}',
-    //       '${item.name}',
-    //       '${item.description}'),
-    //       '${item.category}')`
-    //   )}`
-    // );
-  });
-  db.transaction((tx) => {
-    tx.executeSql("select * from menuItems", [], (_, { rows }) => {
-      console.log(rows);
     });
   });
-  console.log("Yess!?");
 }
 
 export async function filterByQueryAndCategories(query, activeCategories) {
@@ -73,19 +47,21 @@ export async function filterByQueryAndCategories(query, activeCategories) {
             .join(" or ")}`,
           [],
           (_, { rows }) => {
-            resolve(rows._array);
+            // resolve(rows._array);
+            console.log(rows);
           }
         );
       }, reject);
     } else {
       db.transaction((tx) => {
         tx.executeSql(
-          `select * from menuItems where (title like '%${query}%') and (${activeCategories
+          `select * from menuItems where (name like '%${query}%') and (${activeCategories
             .map((category) => `category='${category}'`)
             .join(" or ")})`,
           [],
           (_, { rows }) => {
-            resolve(rows._array);
+            // resolve(rows._array);
+            console.log(rows);
           }
         );
       }, reject);
