@@ -14,9 +14,9 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { MaskedTextInput } from "react-native-mask-text";
-import { saveProfile } from "../database";
+import { saveProfile } from "../controller/database";
 
-const TextInputExample = ({ route, navigation }) => {
+const ProfileMain = ({ route, navigation }) => {
   const { name, contactEmail } = route?.params;
 
   const [image, setImage] = React.useState(null);
@@ -210,14 +210,14 @@ const TextInputExample = ({ route, navigation }) => {
       </View>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => Alert.alert("Log out Button pressed")}
+        onPress={() => navigation?.navigate("Onboarding")}
       >
         <Text style={styles.buttonText}>Log out</Text>
       </TouchableOpacity>
       <View style={[{ marginBottom: 30 }, styles.buttonGroup]}>
         <TouchableOpacity
           style={styles.buttonDiscard}
-          onPress={() => Alert.alert("Discard Button pressed")}
+          onPress={() => navigation?.navigate("Home")}
         >
           <Text style={styles.buttonTextDiscard}>Discard changes</Text>
         </TouchableOpacity>
@@ -229,7 +229,7 @@ const TextInputExample = ({ route, navigation }) => {
   );
 };
 
-const ProfileScreen = ({ route }) => {
+const ProfileScreen = ({ route, navigation }) => {
   return (
     <ScrollView
       style={[
@@ -239,7 +239,7 @@ const ProfileScreen = ({ route }) => {
         },
       ]}
     >
-      <TextInputExample route={route} />
+      <ProfileMain route={route} navigation={navigation} />
     </ScrollView>
   );
 };

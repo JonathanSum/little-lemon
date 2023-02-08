@@ -17,7 +17,7 @@ import {
   filterByQueryAndCategories,
   getMenuItems,
   saveMenuItems,
-} from "../database";
+} from "../controller/database";
 import debounce from "lodash.debounce";
 import { getSectionListData, useUpdateEffect } from "../utils";
 import { Searchbar } from "react-native-paper";

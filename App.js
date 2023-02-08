@@ -16,33 +16,66 @@ import headerImage_white from "./assets/title_white.png";
 import left from "./assets/left.png";
 import photo from "./assets/image.jpg";
 import HomeScreen from "./screens/HomeScreen";
-import { createTable, getProfile } from "./database";
+import { createTable, getProfile } from "./controller/database";
 const Stack = createNativeStackNavigator();
 
+const Back = ({ route }) => {
+  // console.log("navigation of Back", navigation);
+  console.log("route of back: ", route);
+  return (
+    <View
+      style={{
+        flex: 0.2,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Image
+        style={[styles.image_left, { borderRadius: 50, padding: 20 }]}
+        source={left}
+      />
+    </View>
+  );
+};
 export default function App() {
   const [state, setState] = React.useState({
     isLoading: true,
     isOnboardingCompleted: false,
   });
-  const LogoTitle = () => (
-    <View style={[{ flex: 0.15, flexDirection: "row" }, styles.header_white]}>
-      <View
+
+  const LogoTitle = ({ props }) => {
+    console.log("Debug", props);
+    return (
+      <View style={[{ height: 90, flexDirection: "row" }, styles.header_white]}>
+        {/* <View
         style={{
           flex: 0.2,
           justifyContent: "center",
           alignItems: "center",
         }}
       >
-        <Image style={styles.image_left} source={left} />
+        <TouchableOpacity onPress={pickImage}>
+          <Image
+            style={[styles.image_left, { borderRadius: 50, padding: 20 }]}
+            source={left}
+          />
+        </TouchableOpacity>
+      </View> */}
+        <View
+          style={{
+            flex: 0.7,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Image style={styles.image_white} source={headerImage_white} />
+        </View>
+        <View style={{ flex: 0.15, backgroundColor: "yellow" }}>
+          <Image style={styles.image_left} source={left} />
+        </View>
       </View>
-      <View style={{ flex: 0.7, backgroundColor: "darkorange" }}>
-        <Image style={styles.image_white} source={headerImage_white} />
-      </View>
-      <View style={{ flex: 0.15, backgroundColor: "yellow" }}>
-        <Image style={styles.image_left} source={left} />
-      </View>
-    </View>
-  );
+    );
+  };
   const LogoTitleHome = () => (
     <View style={[{ flexDirection: "row" }, styles.headerHome]}>
       <Image style={styles.imageHome} source={headerImage_white} />
@@ -84,11 +117,15 @@ export default function App() {
         <Stack.Screen
           name="Profile"
           component={ProfileScreen}
-          options={{
-            headerTitle: (props) => <LogoTitle {...props} />,
+          options={({ route, navigation }) => ({
+            headerTitle: () => <LogoTitle navigation={navigation} />,
             headerBackVisible: false,
-            // headerLeft: backButton,
-          }}
+            headerLeft: () => (
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <Back route={route} />
+              </TouchableOpacity>
+            ),
+          })}
         />
         <Stack.Screen
           name="Home"
@@ -113,7 +150,7 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  image_white: { width: 300, height: 80 },
+  image_white: { width: 180, height: 70, resizeMode: "contain" },
   image_left: { width: 30, height: 30 },
   header: {
     flex: 1,
@@ -123,7 +160,7 @@ const styles = StyleSheet.create({
   },
   header_white: {
     flex: 1,
-    backgroundColor: "#DEE3E9",
+    backgroundColor: "white",
     alignItems: "center",
     justifyContent: "center",
   },
