@@ -14,14 +14,14 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { MaskedTextInput } from "react-native-mask-text";
-import headerImage from "../assets/title.png";
+
 const TextInputExample = () => {
   const [image, setImage] = React.useState(null);
-  const [fN, onChangeFN] = React.useState("Trilly");
-  const [lN, onChangeLN] = React.useState("Doe");
-  const [email, onChangeEmail] = React.useState("Tillydoe@example.com");
+  const [fN, onChangeFN] = React.useState(" Trilly");
+  const [lN, onChangeLN] = React.useState(" Doe");
+  const [email, onChangeEmail] = React.useState(" Tillydoe@example.com");
 
-  const [phone, onChangePhone] = React.useState("(217) 555-0113");
+  const [phone, onChangePhone] = React.useState(" (217) 555-0113");
 
   const [order, setOrder] = React.useState(true);
   const [pWChange, setPWChange] = React.useState(true);
@@ -46,7 +46,7 @@ const TextInputExample = () => {
       setImage(result.assets[0].uri);
     }
   };
-
+  // console.log("image: ", image);
   return (
     <>
       <Text style={[styles.headerText, { paddingTop: 60 }]}>
@@ -62,7 +62,7 @@ const TextInputExample = () => {
       </Text>
       <View style={styles.buttonGroup}>
         <TouchableOpacity style={styles.image} onPress={pickImage}>
-          {!image ? (
+          {image ? (
             <Image style={styles.image} source={{ uri: image }} />
           ) : (
             <>
@@ -75,15 +75,14 @@ const TextInputExample = () => {
           {/* <Image style={styles.image} source={{ uri: image }} /> */}
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.buttonChange}
-          onPress={() => Alert.alert("Simple Button pressed")}
-        >
+        <TouchableOpacity style={styles.buttonChange} onPress={pickImage}>
           <Text style={styles.buttonTextChange}>Change</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.buttonRemove}
-          onPress={() => Alert.alert("Simple Button pressed")}
+          onPress={() => {
+            setImage(null);
+          }}
         >
           <Text style={styles.buttonTextRemove}>Remove</Text>
         </TouchableOpacity>
@@ -122,6 +121,7 @@ const TextInputExample = () => {
       </Text>
       <View style={styles.checkContainer}>
         <BouncyCheckbox
+          isChecked={order}
           onPress={(isChecked) => {
             setOrder(isChecked);
           }}
@@ -134,8 +134,9 @@ const TextInputExample = () => {
       </View>
       <View style={styles.checkContainer}>
         <BouncyCheckbox
+          isChecked={pWChange}
           onPress={(isChecked) => {
-            setOrder(isChecked);
+            setPWChange(isChecked);
           }}
           innerIconStyle={{
             borderRadius: 0, // to make it a little round increase the value accordingly
@@ -146,8 +147,9 @@ const TextInputExample = () => {
       </View>
       <View style={styles.checkContainer}>
         <BouncyCheckbox
+          isChecked={special}
           onPress={(isChecked) => {
-            setOrder(isChecked);
+            setSpecial(isChecked);
           }}
           innerIconStyle={{
             borderRadius: 0, // to make it a little round increase the value accordingly
@@ -158,8 +160,9 @@ const TextInputExample = () => {
       </View>
       <View style={[styles.checkContainer, { marginBottom: 0 }]}>
         <BouncyCheckbox
+          isChecked={news}
           onPress={(isChecked) => {
-            setOrder(isChecked);
+            setNews(isChecked);
           }}
           innerIconStyle={{
             borderRadius: 0, // to make it a little round increase the value accordingly
@@ -170,20 +173,20 @@ const TextInputExample = () => {
       </View>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => Alert.alert("Simple Button pressed")}
+        onPress={() => Alert.alert("Log out Button pressed")}
       >
         <Text style={styles.buttonText}>Log out</Text>
       </TouchableOpacity>
-      <View style={styles.buttonGroup}>
+      <View style={[{ marginBottom: 30 }, styles.buttonGroup]}>
         <TouchableOpacity
           style={styles.buttonDiscard}
-          onPress={() => Alert.alert("Simple Button pressed")}
+          onPress={() => Alert.alert("Discard Button pressed")}
         >
           <Text style={styles.buttonTextDiscard}>Discard changes</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.buttonSave}
-          onPress={() => Alert.alert("Simple Button pressed")}
+          onPress={() => Alert.alert("Save Button pressed")}
         >
           <Text style={styles.buttonTextSave}>Save changes</Text>
         </TouchableOpacity>

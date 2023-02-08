@@ -8,12 +8,13 @@ import headerImage from "./assets/title.png";
 import headerImage_white from "./assets/title_white.png";
 import photo from "./assets/image.jpg";
 import HomeScreen from "./screens/HomeScreen";
+import Onboarding from "./screens/Onboarding";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [state, setState] = React.useState({
     isLoading: true,
-    isOnboardingCompleted: true,
+    isOnboardingCompleted: false,
   });
   const LogoTitle = () => (
     <View style={[{ flex: 0.15 }, styles.header]}>
@@ -30,7 +31,7 @@ export default function App() {
     <NavigationContainer>
       {state.isOnboardingCompleted ? (
         // Onboarding completed, user is signed in
-        <Stack.Navigator initialRouteName="Home">
+        <Stack.Navigator initialRouteName="onBoarding">
           <Stack.Screen
             name="Profile"
             component={ProfileScreen}
@@ -47,7 +48,17 @@ export default function App() {
 
         // User is NOT signed in
         <Stack.Navigator>
-          <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+          <Stack.Screen
+            name="Onboarding"
+            component={OnboardingScreen}
+            options={{
+              headerTitle: (props) => (
+                <View style={[{ flex: 0.15 }, styles.header]}>
+                  <Image style={styles.image} source={headerImage} />
+                </View>
+              ),
+            }}
+          />
         </Stack.Navigator>
       )}
     </NavigationContainer>

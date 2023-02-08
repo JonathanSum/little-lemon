@@ -149,7 +149,7 @@ const HomeScreen = () => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.searchContainer}
     >
-      <TouchableWithoutFeedback>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View
           style={[
             styles.container,
