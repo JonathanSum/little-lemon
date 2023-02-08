@@ -26,7 +26,7 @@ import { useHeaderHeight } from "@react-navigation/elements";
 const API_URL =
   "https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json";
 const sections = ["starters", "mains", "desserts", "drinks"];
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
   const [data, setData] = React.useState([]);
   const [searchBarText, setSearchBarText] = React.useState("");
   const [query, setQuery] = React.useState("");
@@ -39,7 +39,7 @@ const HomeScreen = () => {
     //This part is a function for fetching and storing data
     (async () => {
       try {
-        await createTable();
+        await createTable("food");
 
         let menuItems = await getMenuItems();
 

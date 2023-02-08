@@ -1,4 +1,11 @@
-import { StyleSheet, Text, View, Image } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Button,
+  TouchableOpacity,
+} from "react-native";
 import OnboardingScreen from "./screens/Onboarding";
 import ProfileScreen from "./screens/ProfileScreen";
 import * as React from "react";
@@ -6,9 +13,10 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import headerImage from "./assets/title.png";
 import headerImage_white from "./assets/title_white.png";
+import left from "./assets/left.png";
 import photo from "./assets/image.jpg";
 import HomeScreen from "./screens/HomeScreen";
-import Onboarding from "./screens/Onboarding";
+import { createTable, getProfile } from "./database";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -17,8 +25,22 @@ export default function App() {
     isOnboardingCompleted: false,
   });
   const LogoTitle = () => (
-    <View style={[{ flex: 0.15 }, styles.header]}>
-      <Image style={styles.image} source={headerImage} />
+    <View style={[{ flex: 0.15, flexDirection: "row" }, styles.header_white]}>
+      <View
+        style={{
+          flex: 0.2,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Image style={styles.image_left} source={left} />
+      </View>
+      <View style={{ flex: 0.7, backgroundColor: "darkorange" }}>
+        <Image style={styles.image_white} source={headerImage_white} />
+      </View>
+      <View style={{ flex: 0.15, backgroundColor: "yellow" }}>
+        <Image style={styles.image_left} source={left} />
+      </View>
     </View>
   );
   const LogoTitleHome = () => (
@@ -27,50 +49,93 @@ export default function App() {
       <Image style={styles.avatar} source={photo} />
     </View>
   );
+  React.useEffect(() => {
+    (async () => {
+      try {
+        await createTable("user");
+        let profile = await getProfile();
+
+        if (profile.length === 1) {
+          setState((prevState) => {
+            return { ...prevState, isOnboardingCompleted: true };
+          });
+        } else if (profile.length > 1) {
+          throw "Something wrong, 2 users in the app.";
+        }
+      } catch (e) {
+        console.error(e.message);
+      }
+    })();
+  }, []);
+  const backButton = () => (
+    <TouchableOpacity
+      style={styles.button}
+      onPress={() => Alert.alert("Log out Button pressed")}
+    >
+      <Text style={styles.buttonText}>Log out</Text>
+    </TouchableOpacity>
+  );
   return (
     <NavigationContainer>
-      {state.isOnboardingCompleted ? (
-        // Onboarding completed, user is signed in
-        <Stack.Navigator initialRouteName="onBoarding">
-          <Stack.Screen
-            name="Profile"
-            component={ProfileScreen}
-            options={{ headerTitle: (props) => <LogoTitle {...props} /> }}
-          />
-          <Stack.Screen
-            name="Home"
-            component={HomeScreen}
-            options={{ headerTitle: (props) => <LogoTitleHome {...props} /> }}
-          />
-        </Stack.Navigator>
-      ) : (
-        // <Stack.Screen name="Home" component={HomeScreen} />
-
-        // User is NOT signed in
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Onboarding"
-            component={OnboardingScreen}
-            options={{
-              headerTitle: (props) => (
-                <View style={[{ flex: 0.15 }, styles.header]}>
-                  <Image style={styles.image} source={headerImage} />
-                </View>
-              ),
-            }}
-          />
-        </Stack.Navigator>
-      )}
+      {/* Onboarding completed, user is signed in */}
+      <Stack.Navigator
+        initialRouteName={!state.isOnboardingCompleted ? "Onboarding" : "Home"}
+      >
+        <Stack.Screen
+          name="Profile"
+          component={ProfileScreen}
+          options={{
+            headerTitle: (props) => <LogoTitle {...props} />,
+            headerBackVisible: false,
+            // headerLeft: backButton,
+          }}
+        />
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ headerTitle: (props) => <LogoTitleHome {...props} /> }}
+        />
+        {/* User is NOT signed in */}
+        <Stack.Screen
+          name="Onboarding"
+          component={OnboardingScreen}
+          options={{
+            headerTitle: (props) => (
+              <View style={[{ flex: 0.15 }, styles.header]}>
+                <Image style={styles.image} source={headerImage} />
+              </View>
+            ),
+          }}
+        />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
 const styles = StyleSheet.create({
+  image_white: { width: 300, height: 80 },
+  image_left: { width: 30, height: 30 },
   header: {
     flex: 1,
     backgroundColor: "#DEE3E9",
     alignItems: "center",
     justifyContent: "center",
+  },
+  header_white: {
+    flex: 1,
+    backgroundColor: "#DEE3E9",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  button: {
+    // alignItems: "center",
+    // justifyContent: "center",
+    borderColor: "#E1B549",
+    borderWidth: 2,
+    backgroundColor: "#F4CE14",
+
+    // height: 50,
+    borderRadius: 10,
   },
   headerHome: {
     flex: 1,

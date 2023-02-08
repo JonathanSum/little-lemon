@@ -6,17 +6,16 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Alert,
   Image,
   ScrollView,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import headerImage from "../assets/title.png";
-const Main = () => {
-  const [email, onChangeEmail] = React.useState("");
-  const [fN, onChangeFN] = React.useState("");
+// import headerImage from "../assets/title.png";
+const Main = ({ navigation }) => {
+  const [contactEmail, onChangeContactEmail] = React.useState("");
+  const [name, onChangeName] = React.useState("");
   const [state, setState] = React.useState({
     isLoading: true,
   });
@@ -58,15 +57,15 @@ const Main = () => {
             <Text style={[styles.text, { paddingTop: 10 }]}>Name *</Text>
             <TextInput
               style={[styles.input, styles.text]}
-              onChangeText={onChangeFN}
-              value={fN}
+              onChangeText={onChangeName}
+              value={name}
             />
 
-            <Text style={[styles.text]}>Email</Text>
+            <Text style={[styles.text]}>Email *</Text>
             <TextInput
               style={[styles.input, styles.text]}
-              onChangeText={onChangeEmail}
-              value={email}
+              onChangeText={onChangeContactEmail}
+              value={contactEmail}
               placeholder=""
             />
           </View>
@@ -80,7 +79,12 @@ const Main = () => {
           >
             <TouchableOpacity
               style={styles.button}
-              onPress={() => Alert.alert("Simple Button pressed")}
+              onPress={() =>
+                navigation.navigate("Profile", {
+                  name: name,
+                  contactEmail: contactEmail,
+                })
+              }
             >
               <Text style={styles.buttonText}>Next</Text>
             </TouchableOpacity>
@@ -91,7 +95,7 @@ const Main = () => {
   );
 };
 
-const Onboarding = () => {
+const Onboarding = ({ navigation }) => {
   return (
     <SafeAreaView
       style={[
@@ -101,7 +105,7 @@ const Onboarding = () => {
         },
       ]}
     >
-      <Main />
+      <Main navigation={navigation} />
     </SafeAreaView>
   );
 };

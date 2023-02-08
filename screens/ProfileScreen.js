@@ -14,20 +14,23 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { MaskedTextInput } from "react-native-mask-text";
+import { saveProfile } from "../database";
 
-const TextInputExample = () => {
+const TextInputExample = ({ route, navigation }) => {
+  const { name, contactEmail } = route?.params;
+
   const [image, setImage] = React.useState(null);
-  const [fN, onChangeFN] = React.useState(" Trilly");
-  const [lN, onChangeLN] = React.useState(" Doe");
-  const [email, onChangeEmail] = React.useState(" Tillydoe@example.com");
 
-  const [phone, onChangePhone] = React.useState(" (217) 555-0113");
+  const [fN, onChangeFN] = React.useState(name);
+  const [lN, onChangeLN] = React.useState(" ");
 
-  const [order, setOrder] = React.useState(true);
-  const [pWChange, setPWChange] = React.useState(true);
-  const [special, setSpecial] = React.useState(true);
-  const [news, setNews] = React.useState(true);
-  const [toggleCheckBox, setToggleCheckBox] = React.useState(true);
+  const [email, onChangeEmail] = React.useState(contactEmail);
+  const [phone, onChangePhone] = React.useState("(217) 555-0113");
+
+  const [order, setOrder] = React.useState(false);
+  const [pWChange, setPWChange] = React.useState(false);
+  const [special, setSpecial] = React.useState(false);
+  const [news, setNews] = React.useState(false);
   const [state, setState] = React.useState({
     isLoading: true,
   });
@@ -45,6 +48,40 @@ const TextInputExample = () => {
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
+  };
+  const handleSubmit = () => {
+    const validRegex =
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    if (!fN) {
+      Alert.show("First name is required");
+      return;
+    } else if (!lN) {
+      Alert.show("Last name is required");
+      return;
+    } else if (!phone) {
+      Alert.show("Phone Number is required");
+      return;
+    }
+    if (!email) {
+      Alert.show("Email is required.");
+      return;
+    } else if (!email.match(validRegex)) {
+      Alert.show("Invalid Email");
+      return;
+    }
+    const form = {
+      image,
+      fN,
+      lN,
+      email,
+      phone,
+      order,
+      pWChange,
+      special,
+      news,
+    };
+    // console.log(form);
+    saveProfile(form);
   };
   // console.log("image: ", image);
   return (
@@ -72,7 +109,6 @@ const TextInputExample = () => {
               </Text>
             </>
           )}
-          {/* <Image style={styles.image} source={{ uri: image }} /> */}
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.buttonChange} onPress={pickImage}>
@@ -116,6 +152,7 @@ const TextInputExample = () => {
         defaultValue={phone}
         style={styles.phoneInput}
       />
+
       <Text style={[styles.bottomTitle, { paddingBottom: 15 }]}>
         Email notifications
       </Text>
@@ -184,10 +221,7 @@ const TextInputExample = () => {
         >
           <Text style={styles.buttonTextDiscard}>Discard changes</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.buttonSave}
-          onPress={() => Alert.alert("Save Button pressed")}
-        >
+        <TouchableOpacity style={styles.buttonSave} onPress={handleSubmit}>
           <Text style={styles.buttonTextSave}>Save changes</Text>
         </TouchableOpacity>
       </View>
@@ -195,7 +229,7 @@ const TextInputExample = () => {
   );
 };
 
-const ProfileScreen = () => {
+const ProfileScreen = ({ route }) => {
   return (
     <ScrollView
       style={[
@@ -205,7 +239,7 @@ const ProfileScreen = () => {
         },
       ]}
     >
-      <TextInputExample />
+      <TextInputExample route={route} />
     </ScrollView>
   );
 };
@@ -217,7 +251,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 95,
     height: 95,
-    backgroundColor: "#fff",
     borderRadius: 50,
     marginRight: 5,
     marginLeft: 4.5,
@@ -309,12 +342,14 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     fontSize: 20,
     color: "#374B57",
+    paddingHorizontal: 20,
   },
   input: {
     height: 40,
     borderWidth: 1,
     borderRadius: 10,
     borderColor: "#374B57",
+    paddingHorizontal: 20,
   },
   headerText: {
     fontSize: 32,
