@@ -48,10 +48,7 @@ const HomeScreen = ({ navigation }) => {
           console.log("!menuItems.length");
           const response = await fetch(API_URL);
           const json = await response.json();
-          menuItems = json.menu.map((item) => ({
-            ...item,
-            category: item.category,
-          }));
+          menuItems = json.menu;
 
           // Storing into database
           saveMenuItems(menuItems);
@@ -60,7 +57,7 @@ const HomeScreen = ({ navigation }) => {
         // const sectionListData = getSectionListData(menuItems);
         // // console.log(JSON.stringify(sectionListData));
         // setData(sectionListData);
-        console.log("menuItems", menuItems);
+        // console.log("menuItems", menuItems);
         setData(menuItems);
       } catch (e) {
         console.error(e.message);
@@ -83,7 +80,7 @@ const HomeScreen = ({ navigation }) => {
         );
         // const sectionListData = getSectionListData(menuItems);
         // setData(sectionListData);
-        console.log("filtered", menuItems);
+        // console.log("filtered", menuItems);
         setData(menuItems);
       } catch (e) {
         console.error(e.message);
@@ -144,7 +141,7 @@ const HomeScreen = ({ navigation }) => {
     />
   );
   const height = useHeaderHeight();
-  console.log("data", data);
+  // console.log("data", data);
   return (
     <KeyboardAvoidingView
       keyboardVerticalOffset={height - 164}

@@ -27,7 +27,7 @@ const Back = ({ route, marginLeft }) => {
   return (
     <View
       style={{
-        flex: 0.2,
+        flex: 1,
         justifyContent: "center",
         alignItems: "center",
         marginLeft: marginLeft || 0,
@@ -45,9 +45,27 @@ export default function App() {
   const [state, setState] = React.useState({
     isLoading: true,
     isOnboardingCompleted: false,
+    profile: {},
   });
 
   const LogoTitle = () => {
+    const [avatar, setAvatar] = React.useState("");
+    React.useEffect(() => {
+      (async () => {
+        try {
+          const avatar_url = await getAvatar();
+          if (
+            avatar_url[0].avatar !== undefined &&
+            avatar_url[0].avatar !== null
+          ) {
+            setAvatar(avatar_url[0].avatar);
+          }
+          // console.log("avatar at header", avatar_url);
+        } catch (e) {
+          console.error(e.message);
+        }
+      })();
+    }, []);
     return (
       <View style={[{ height: 90, flexDirection: "row" }, styles.header_white]}>
         <View
@@ -59,18 +77,29 @@ export default function App() {
         >
           <Image style={styles.image_white} source={headerImage_white} />
         </View>
-        <View style={{ flex: 0.15, backgroundColor: "yellow" }}>
-          <Image style={styles.image_left} source={left} />
+        <View style={{ flex: 0.15 }}>
+          {avatar && <Image style={styles.avatar} source={{ uri: avatar }} />}
         </View>
       </View>
     );
   };
   //TODO: add the avatar picture here
-  const LogoTitleHome = () => {
-    const avatar_img = getAvatar();
-    // console.log("avatar at header", avatar);
-    const [avatar, setAvatar] = React.useState(avatar_img[0]);
-
+  const LogoTitleHome = ({ navigation }) => {
+    const [avatar, setAvatar] = React.useState("");
+    React.useEffect(() => {
+      (async () => {
+        try {
+          const avatar_url = await getAvatar();
+          if (avatar_url.length) {
+            setAvatar(avatar_url[0].avatar);
+          }
+          // console.log("avatar at header", avatar_url);
+        } catch (e) {
+          console.error(e.message);
+        }
+      })();
+    }, []);
+    console.log("Debug: ", navigation);
     return (
       <View
         style={[
@@ -81,7 +110,12 @@ export default function App() {
         ]}
       >
         <Image style={styles.imageHome} source={headerImage_white} />
-        {avatar && <Image style={styles.avatar} source={{ uri: avatar }} />}
+
+        {avatar && (
+          <TouchableOpacity onPress={() => navigation?.navigate("Profile")}>
+            <Image style={styles.avatar} source={{ uri: avatar }} />
+          </TouchableOpacity>
+        )}
       </View>
     );
   };
@@ -89,13 +123,18 @@ export default function App() {
     (async () => {
       try {
         await createTable("user");
-        let profile = await getProfile();
+        console.log("At App");
+        let database_profile = await getProfile();
 
-        if (profile.length === 1) {
+        if (database_profile.length === 1) {
           setState((prevState) => {
-            return { ...prevState, isOnboardingCompleted: true };
+            return {
+              ...prevState,
+              isOnboardingCompleted: true,
+              profile: database_profile[0],
+            };
           });
-        } else if (profile.length > 1) {
+        } else if (database_profile.length > 1) {
           throw "Something wrong, 2 users in the app.";
         }
       } catch (e) {
@@ -128,7 +167,7 @@ export default function App() {
           component={HomeScreen}
           options={({ route, navigation }) => ({
             // headerShown: false,
-            headerTitle: () => <LogoTitleHome />,
+            headerTitle: () => <LogoTitleHome navigation={navigation} />,
             headerBackVisible: false,
             headerLeft: () => (
               <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -143,13 +182,16 @@ export default function App() {
           component={OnboardingScreen}
           options={({ route, navigation }) => ({
             headerTitle: () => (
-              <View style={[{ flex: 0.15 }, styles.header]}>
-                <Image style={styles.image} source={headerImage} />
+              <View style={[{ flex: 1 }, styles.header]}>
+                <Image style={{ resizeMode: "contain" }} source={headerImage} />
               </View>
             ),
             headerBackVisible: false,
             headerLeft: () => (
-              <TouchableOpacity onPress={() => navigation.goBack()}>
+              <TouchableOpacity
+                style={[{ backgroundColor: "#DEE3E9", paddingLeft: 10 }]}
+                onPress={() => navigation.goBack()}
+              >
                 <Back route={route} />
               </TouchableOpacity>
             ),

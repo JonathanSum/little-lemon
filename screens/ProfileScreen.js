@@ -14,22 +14,33 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { MaskedTextInput } from "react-native-mask-text";
-import { cleanProfile, saveProfile } from "../controller/database";
+import {
+  cleanProfile,
+  getAvatar,
+  getProfile,
+  saveProfile,
+} from "../controller/database";
 
 const ProfileMain = ({ route, navigation }) => {
   const { name, contactEmail } = route?.params;
 
-  const [image, setImage] = React.useState(null);
+  const [image, setImage] = React.useState("");
 
-  const [fN, onChangeFN] = React.useState(name);
-  const [lN, onChangeLN] = React.useState(" ");
+  // const [fN, onChangeFN] = React.useState(name);
+  // const [lN, onChangeLN] = React.useState(" ");
 
-  const [email, onChangeEmail] = React.useState(contactEmail);
-  const [phone, onChangePhone] = React.useState("(217) 555-0113");
+  // const [email, onChangeEmail] = React.useState(contactEmail);
 
-  const [order, setOrder] = React.useState(false);
+  const [fN, onChangeFN] = React.useState("F1");
+  const [lN, onChangeLN] = React.useState("L1");
+
+  const [email, onChangeEmail] = React.useState("XXX@gmail.com");
+
+  const [phone, onChangePhone] = React.useState("(111)-111-2222");
+
+  const [order, setOrder] = React.useState(true);
   const [pWChange, setPWChange] = React.useState(false);
-  const [special, setSpecial] = React.useState(false);
+  const [special, setSpecial] = React.useState(true);
   const [news, setNews] = React.useState(false);
   const [state, setState] = React.useState({
     isLoading: true,
@@ -49,24 +60,24 @@ const ProfileMain = ({ route, navigation }) => {
       setImage(result.assets[0].uri);
     }
   };
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const validRegex =
       /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
     if (!fN) {
-      Alert.show("First name is required");
+      Alert.alert("First name is required");
       return;
     } else if (!lN) {
-      Alert.show("Last name is required");
+      Alert.alert("Last name is required");
       return;
     } else if (!phone) {
-      Alert.show("Phone Number is required");
+      Alert.alert("Phone Number is required");
       return;
     }
     if (!email) {
-      Alert.show("Email is required.");
+      Alert.alert("Email is required.");
       return;
     } else if (!email.match(validRegex)) {
-      Alert.show("Invalid Email");
+      Alert.alert("Invalid Email");
       return;
     }
     const form = {
@@ -81,7 +92,8 @@ const ProfileMain = ({ route, navigation }) => {
       news,
     };
     // console.log(form);
-    saveProfile(form);
+    await saveProfile(form);
+    navigation?.navigate("Home");
   };
   // console.log("image: ", image);
   const handleLogOut = () => {
@@ -90,6 +102,34 @@ const ProfileMain = ({ route, navigation }) => {
     })();
     navigation?.navigate("Onboarding");
   };
+
+  const [profile, setProfile] = React.useState({});
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const userData = await getProfile();
+
+        console.log("now userData??: ", userData);
+        if (userData.length) {
+          setImage(userData[0].avatar);
+          onChangeFN(userData[0].firstName);
+          onChangeLN(userData[0].lastName);
+          onChangeEmail(userData[0].email);
+          onChangePhone(userData[0].phone);
+          setOrder(userData[0].check_statues === 1 ? true : false);
+          setPWChange(userData[0].check_pw_change === 1 ? true : false);
+          setSpecial(userData[0].check_special === 1 ? true : false);
+          setNews(userData[0].check_news_letter === 1 ? true : false);
+        } else {
+          console.log("no profile: ", profile);
+        }
+        // console.log("avatar at header", avatar_url);
+      } catch (e) {
+        console.error(e.message);
+      }
+    })();
+  }, []);
+
   return (
     <>
       <Text style={[styles.headerText, { paddingTop: 60 }]}>

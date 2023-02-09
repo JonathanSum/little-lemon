@@ -1,7 +1,8 @@
 import * as SQLite from "expo-sqlite";
 
 const db = SQLite.openDatabase("little_lemon");
-
+const profile_table_create =
+  "create table if not exists Profile (firstName varchar(255),lastName varchar(255),email varcgar(255),phone varchar(255),avatar text,check_statues BOOLEAN NOT NULL CHECK (check_statues IN (0, 1)) DEFAULT 0,check_pw_change BOOLEAN NOT NULL CHECK (check_pw_change IN (0, 1)) DEFAULT 0,check_special BOOLEAN NOT NULL CHECK (check_special IN (0, 1)) DEFAULT 0,check_news_letter BOOLEAN NOT NULL CHECK (check_news_letter IN (0, 1)) DEFAULT 0);";
 export async function checkLogin() {
   return new Promise((resolve, reject) => {
     db.transaction(
@@ -32,19 +33,7 @@ export async function createTable(type) {
     return new Promise((resolve, reject) => {
       db.transaction(
         (tx) => {
-          tx.executeSql(
-            "create table if not exists Profile (\
-              firstName varchar(255),\
-                lastName varchar(255),\
-                email varcgar(255),\
-                phone varchar(255),\
-                avatar text,\
-                check_statues BOOLEAN NOT NULL CHECK (check_statues IN (0, 1)) DEFAULT 0,\
-                check_pw_change BOOLEAN NOT NULL CHECK (check_pw_change IN (0, 1)) DEFAULT 0,\
-                check_special BOOLEAN NOT NULL CHECK (check_special IN (0, 1)) DEFAULT 0,\
-                check_news_letter BOOLEAN NOT NULL CHECK (check_news_letter IN (0, 1)) DEFAULT 0\
-              )"
-          );
+          tx.executeSql(profile_table_create);
         },
         reject,
         resolve //
@@ -68,7 +57,7 @@ export async function getProfile() {
       (tx) => {
         tx.executeSql("select * from Profile", [], (_, { rows }) => {
           resolve(rows._array);
-          console.log("Profile rows", rows);
+          // console.log("Profile rows", rows);
         });
       },
       reject,
@@ -97,25 +86,30 @@ export async function getAvatar() {
       tx.executeSql(`select avatar from Profile;`, [], (_, { rows }) => {
         resolve(rows._array);
         console.log("avatar: ", rows);
+        return rows;
       });
     });
   });
 }
 
-export function saveProfile(profile) {
+export async function saveProfile(profile) {
+  console.log("profile", profile);
   db.transaction((tx) => {
+    //This part is about truncate the table if the Profile table exist.
+    tx.executeSql(`DROP TABLE IF EXISTS Profile;`);
+
+    //This part is about updating the Profile
+    tx.executeSql(profile_table_create);
     tx.executeSql(
-      `insert into Profile (firstName, lastName, email, phone, avatar, check_statues, check_pw_change, check_special, check_news_letter)
-        values ("${profile.firstName}",
-                "${profile.lastName}",
-                "${profile.email}",
-                "${profile.phone}",
-                "${profile.avatar}",
-                "${profile.check_statues}",
-                "${profile.check_pw_change}",
-                "${profile.check_special}",
-                "${profile.check_news_letter}");`
+      `insert into Profile (firstName, lastName, email, phone, avatar, check_statues, check_pw_change, check_special, check_news_letter) values ("${profile.fN}", "${profile.lN}", "${profile.email}", "${profile.phone}", "${profile.image}", ${profile.order}, ${profile.pWChange}, ${profile.special}, ${profile.news});`
     );
+  });
+  db.transaction((tx) => {
+    console.log("after creating a profile in database");
+    tx.executeSql(`select * from Profile;`, [], (_, { rows }) => {
+      // resolve(rows._array);
+      console.log("rows!!!!", rows);
+    });
   });
 }
 export async function filterByQueryAndCategories(query, activeCategories) {

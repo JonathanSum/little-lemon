@@ -77,17 +77,19 @@ const Main = ({ navigation }) => {
               styles.bottom,
             ]}
           >
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() =>
-                navigation.navigate("Profile", {
-                  name: name,
-                  contactEmail: contactEmail,
-                })
-              }
-            >
-              <Text style={styles.buttonText}>Next</Text>
-            </TouchableOpacity>
+            {name !== "" && contactEmail !== "" && (
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() =>
+                  navigation.navigate("Profile", {
+                    name: name,
+                    contactEmail: contactEmail,
+                  })
+                }
+              >
+                <Text style={styles.buttonText}>Next</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </>
       </TouchableWithoutFeedback>
