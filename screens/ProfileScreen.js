@@ -14,7 +14,7 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { MaskedTextInput } from "react-native-mask-text";
-import { saveProfile } from "../controller/database";
+import { cleanProfile, saveProfile } from "../controller/database";
 
 const ProfileMain = ({ route, navigation }) => {
   const { name, contactEmail } = route?.params;
@@ -84,6 +84,12 @@ const ProfileMain = ({ route, navigation }) => {
     saveProfile(form);
   };
   // console.log("image: ", image);
+  const handleLogOut = () => {
+    (async () => {
+      await cleanProfile();
+    })();
+    navigation?.navigate("Onboarding");
+  };
   return (
     <>
       <Text style={[styles.headerText, { paddingTop: 60 }]}>
@@ -208,10 +214,7 @@ const ProfileMain = ({ route, navigation }) => {
         />
         <Text style={styles.label}>Newsletter</Text>
       </View>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation?.navigate("Onboarding")}
-      >
+      <TouchableOpacity style={styles.button} onPress={handleLogOut}>
         <Text style={styles.buttonText}>Log out</Text>
       </TouchableOpacity>
       <View style={[{ marginBottom: 30 }, styles.buttonGroup]}>

@@ -19,7 +19,7 @@ import {
   saveMenuItems,
 } from "../controller/database";
 import debounce from "lodash.debounce";
-import { getSectionListData, useUpdateEffect } from "../utils";
+import { getSectionListData, useUpdateEffect } from "../controller/utils";
 import { Searchbar } from "react-native-paper";
 import Filters from "./Filters";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -33,6 +33,7 @@ const HomeScreen = ({ navigation }) => {
   const [filterSelections, setFilterSelections] = React.useState(
     sections.map(() => false)
   );
+  const [avatar, setAvatar] = React.useState("");
   React.useEffect(() => {
     // let T1 = getMenuItems();
     // console.log(T1);
@@ -143,44 +144,44 @@ const HomeScreen = ({ navigation }) => {
     />
   );
   const height = useHeaderHeight();
+  console.log("data", data);
   return (
     <KeyboardAvoidingView
       keyboardVerticalOffset={height - 164}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.searchContainer}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View
+        style={[
+          styles.container,
+          {
+            // Try setting `flexDirection` to `"row"`.
+            flexDirection: "column",
+          },
+        ]}
+      >
         <View
-          style={[
-            styles.container,
-            {
-              // Try setting `flexDirection` to `"row"`.
-              flexDirection: "column",
-            },
-          ]}
+          style={{ flex: 0.45, backgroundColor: "#495E57", paddingLeft: 25 }}
         >
-          <View
-            style={{ flex: 0.48, backgroundColor: "#495E57", paddingLeft: 25 }}
-          >
-            <Text style={styles.HeaderText}>Little Lemon</Text>
-            <View style={{ flexDirection: "row" }}>
-              <View>
-                <Text style={styles.topTextHeader}>Chicago</Text>
-                <Text style={styles.topTextP}>
-                  We are a family owned{"\n"}
-                  Mediterranean restaurant,{"\n"}
-                  focused on traditional{"\n"}
-                  recipes served with a{"\n"}
-                  modern twist.
-                </Text>
-              </View>
-
-              <Image
-                style={styles.titleImage}
-                source={require("../assets/handle.jpg")}
-              />
+          <Text style={styles.HeaderText}>Little Lemon</Text>
+          <View style={{ flexDirection: "row" }}>
+            <View>
+              <Text style={styles.topTextHeader}>Chicago</Text>
+              <Text style={styles.topTextP}>
+                We are a family owned{"\n"}
+                Mediterranean restaurant,{"\n"}
+                focused on traditional{"\n"}
+                recipes served with a{"\n"}
+                modern twist.
+              </Text>
             </View>
 
+            <Image
+              style={styles.titleImage}
+              source={require("../assets/handle.jpg")}
+            />
+          </View>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <Searchbar
               placeholder="Search"
               placeholderTextColor="#4D625B"
@@ -191,37 +192,42 @@ const HomeScreen = ({ navigation }) => {
               inputStyle={{ color: "#4D625B" }}
               elevation={0}
             />
-          </View>
+          </TouchableWithoutFeedback>
+        </View>
 
-          <View style={{ flex: 0.2, backgroundColor: "white" }}>
-            <Text style={styles.deliveryHeaderText}>ORDER FOR DELIVERY!</Text>
-            <Filters
-              selections={filterSelections}
-              onChange={handleFiltersChange}
-              sections={sections}
-            />
-          </View>
-          <View
-            style={{
-              marginHorizontal: 10,
-              borderBottomColor: "black",
-              borderBottomWidth: StyleSheet.hairlineWidth,
+        <View style={{ flex: 0.2, backgroundColor: "white" }}>
+          <Text style={styles.deliveryHeaderText}>ORDER FOR DELIVERY!</Text>
+          <Filters
+            selections={filterSelections}
+            onChange={handleFiltersChange}
+            sections={sections}
+          />
+        </View>
+        <View
+          style={{
+            marginHorizontal: 10,
+            borderBottomColor: "black",
+            borderBottomWidth: StyleSheet.hairlineWidth,
+          }}
+        />
+        <View style={{ flex: 0.35, backgroundColor: "white" }}>
+          <FlatList
+            data={data}
+            renderItem={renderItem}
+            keyExtractor={(item) => {
+              return item.id ? item.id : item.name;
             }}
           />
-          <View style={{ flex: 0.35, backgroundColor: "white" }}>
-            <FlatList
-              data={data}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id}
-            />
-          </View>
         </View>
-      </TouchableWithoutFeedback>
+      </View>
     </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
+  cards: {
+    flex: 1,
+  },
   searchBarStyle: {
     // marginVertical: 24,
     backgroundColor: "#EDEFEE",

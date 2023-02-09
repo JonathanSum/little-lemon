@@ -9,6 +9,7 @@ import {
 import OnboardingScreen from "./screens/Onboarding";
 import ProfileScreen from "./screens/ProfileScreen";
 import * as React from "react";
+import { createContext, useContext } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import headerImage from "./assets/title.png";
@@ -16,9 +17,7 @@ import headerImage_white from "./assets/title_white.png";
 import left from "./assets/left.png";
 import photo from "./assets/image.jpg";
 import HomeScreen from "./screens/HomeScreen";
-import { createTable, getProfile } from "./controller/database";
-import { AvatarProvider, useAvatar } from "./controller/avatar";
-// import { useTheme } from "../ThemeContext";
+import { createTable, getAvatar, getProfile } from "./controller/database";
 
 const Stack = createNativeStackNavigator();
 
@@ -41,64 +40,51 @@ const Back = ({ route, marginLeft }) => {
     </View>
   );
 };
+
 export default function App() {
   const [state, setState] = React.useState({
     isLoading: true,
     isOnboardingCompleted: false,
   });
 
-  const { image, update } = useAvatar();
-  update("Yes???");
-  console.log(useAvatar());
   const LogoTitle = () => {
     return (
-      <AvatarProvider>
+      <View style={[{ height: 90, flexDirection: "row" }, styles.header_white]}>
         <View
-          style={[{ height: 90, flexDirection: "row" }, styles.header_white]}
+          style={{
+            flex: 0.7,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
         >
-          {/* <View
-        style={{
-          flex: 0.2,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <TouchableOpacity onPress={pickImage}>
-          <Image
-            style={[styles.image_left, { borderRadius: 50, padding: 20 }]}
-            source={left}
-          />
-        </TouchableOpacity>
-      </View> */}
-          <View
-            style={{
-              flex: 0.7,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Image style={styles.image_white} source={headerImage_white} />
-          </View>
-          <View style={{ flex: 0.15, backgroundColor: "yellow" }}>
-            <Image style={styles.image_left} source={left} />
-          </View>
+          <Image style={styles.image_white} source={headerImage_white} />
         </View>
-      </AvatarProvider>
+        <View style={{ flex: 0.15, backgroundColor: "yellow" }}>
+          <Image style={styles.image_left} source={left} />
+        </View>
+      </View>
     );
   };
-  const LogoTitleHome = () => (
-    <View
-      style={[
-        {
-          flexDirection: "row",
-        },
-        styles.headerHome,
-      ]}
-    >
-      <Image style={styles.imageHome} source={headerImage_white} />
-      <Image style={styles.avatar} source={photo} />
-    </View>
-  );
+  //TODO: add the avatar picture here
+  const LogoTitleHome = () => {
+    const avatar_img = getAvatar();
+    // console.log("avatar at header", avatar);
+    const [avatar, setAvatar] = React.useState(avatar_img[0]);
+
+    return (
+      <View
+        style={[
+          {
+            flexDirection: "row",
+          },
+          styles.headerHome,
+        ]}
+      >
+        <Image style={styles.imageHome} source={headerImage_white} />
+        {avatar && <Image style={styles.avatar} source={{ uri: avatar }} />}
+      </View>
+    );
+  };
   React.useEffect(() => {
     (async () => {
       try {
@@ -141,6 +127,7 @@ export default function App() {
           name="Home"
           component={HomeScreen}
           options={({ route, navigation }) => ({
+            // headerShown: false,
             headerTitle: () => <LogoTitleHome />,
             headerBackVisible: false,
             headerLeft: () => (

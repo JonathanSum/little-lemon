@@ -76,6 +76,7 @@ export async function getProfile() {
     );
   });
 }
+
 export function saveMenuItems(menuItems) {
   db.transaction((tx) => {
     menuItems.map((item) => {
@@ -85,11 +86,22 @@ export function saveMenuItems(menuItems) {
     });
   });
 }
-export function cleanProfile() {
+export async function cleanProfile() {
   db.transaction((tx) => {
     tx.executeSql(`truncate table Profile;`);
   });
 }
+export async function getAvatar() {
+  return new Promise((resolve) => {
+    db.transaction((tx) => {
+      tx.executeSql(`select avatar from Profile;`, [], (_, { rows }) => {
+        resolve(rows._array);
+        console.log("avatar: ", rows);
+      });
+    });
+  });
+}
+
 export function saveProfile(profile) {
   db.transaction((tx) => {
     tx.executeSql(
