@@ -100,7 +100,7 @@ const ProfileMain = ({ route, navigation }) => {
     (async () => {
       await cleanProfile();
     })();
-    navigation?.navigate("Onboarding");
+    // navigation?.navigate("Onboarding");
   };
 
   const [profile, setProfile] = React.useState({});
