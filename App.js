@@ -99,7 +99,7 @@ export default function App() {
         }
       })();
     }, []);
-    console.log("Debug: ", navigation);
+
     return (
       <View
         style={[
@@ -111,11 +111,7 @@ export default function App() {
       >
         <Image style={styles.imageHome} source={headerImage_white} />
 
-        {avatar && (
-          <TouchableOpacity onPress={() => navigation?.navigate("Profile")}>
-            <Image style={styles.avatar} source={{ uri: avatar }} />
-          </TouchableOpacity>
-        )}
+        {avatar && <Image style={styles.avatar} source={{ uri: avatar }} />}
       </View>
     );
   };
@@ -147,7 +143,7 @@ export default function App() {
     <NavigationContainer>
       {/* Onboarding completed, user is signed in */}
       <Stack.Navigator
-        initialRouteName={!state.isOnboardingCompleted ? "Onboarding" : "Home"}
+        initialRouteName={state.isOnboardingCompleted ? "Onboarding" : "Home"}
       >
         <Stack.Screen
           name="Profile"

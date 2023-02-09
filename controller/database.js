@@ -79,7 +79,6 @@ export async function cleanProfile() {
   db.transaction((tx) => {
     tx.executeSql(`truncate table Profile;`);
   });
-  console.log("Test cleaning");
 }
 export async function getAvatar() {
   return new Promise((resolve) => {

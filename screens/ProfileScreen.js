@@ -26,25 +26,21 @@ const ProfileMain = ({ route, navigation }) => {
 
   const [image, setImage] = React.useState("");
 
-  // const [fN, onChangeFN] = React.useState(name);
-  // const [lN, onChangeLN] = React.useState(" ");
+  const [fN, onChangeFN] = React.useState(name);
+  const [lN, onChangeLN] = React.useState(" ");
 
-  // const [email, onChangeEmail] = React.useState(contactEmail);
+  const [email, onChangeEmail] = React.useState(contactEmail);
 
-  const [fN, onChangeFN] = React.useState("F1");
-  const [lN, onChangeLN] = React.useState("L1");
+  const [phone, onChangePhone] = React.useState("");
 
-  const [email, onChangeEmail] = React.useState("XXX@gmail.com");
-
-  const [phone, onChangePhone] = React.useState("(111)-111-2222");
-
-  const [order, setOrder] = React.useState(true);
+  const [order, setOrder] = React.useState(false);
   const [pWChange, setPWChange] = React.useState(false);
-  const [special, setSpecial] = React.useState(true);
+  const [special, setSpecial] = React.useState(false);
   const [news, setNews] = React.useState(false);
   const [state, setState] = React.useState({
     isLoading: true,
   });
+  const [logoutOn, setLogoutOn] = React.useState(false);
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -99,17 +95,16 @@ const ProfileMain = ({ route, navigation }) => {
   const handleLogOut = () => {
     (async () => {
       await cleanProfile();
+      setLogoutOn(false);
     })();
     // navigation?.navigate("Onboarding");
   };
 
-  const [profile, setProfile] = React.useState({});
   React.useEffect(() => {
     (async () => {
       try {
         const userData = await getProfile();
-
-        console.log("now userData??: ", userData);
+        setLogoutOn(true);
         if (userData.length) {
           setImage(userData[0].avatar);
           onChangeFN(userData[0].firstName);
@@ -121,7 +116,7 @@ const ProfileMain = ({ route, navigation }) => {
           setSpecial(userData[0].check_special === 1 ? true : false);
           setNews(userData[0].check_news_letter === 1 ? true : false);
         } else {
-          console.log("no profile: ", profile);
+          // console.log("no profile: ", profile);   //for debugging
         }
         // console.log("avatar at header", avatar_url);
       } catch (e) {
@@ -254,9 +249,11 @@ const ProfileMain = ({ route, navigation }) => {
         />
         <Text style={styles.label}>Newsletter</Text>
       </View>
-      <TouchableOpacity style={styles.button} onPress={handleLogOut}>
-        <Text style={styles.buttonText}>Log out</Text>
-      </TouchableOpacity>
+      {logoutOn && (
+        <TouchableOpacity style={styles.button} onPress={handleLogOut}>
+          <Text style={styles.buttonText}>Log out</Text>
+        </TouchableOpacity>
+      )}
       <View style={[{ marginBottom: 30 }, styles.buttonGroup]}>
         <TouchableOpacity
           style={styles.buttonDiscard}
