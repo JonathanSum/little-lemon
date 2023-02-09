@@ -14,23 +14,33 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { MaskedTextInput } from "react-native-mask-text";
-import headerImage from "../assets/title.png";
-const TextInputExample = () => {
-  const [image, setImage] = React.useState(null);
-  const [fN, onChangeFN] = React.useState("Trilly");
-  const [lN, onChangeLN] = React.useState("Doe");
-  const [email, onChangeEmail] = React.useState("Tillydoe@example.com");
+import {
+  cleanProfile,
+  getAvatar,
+  getProfile,
+  saveProfile,
+} from "../controller/database";
 
-  const [phone, onChangePhone] = React.useState("(217) 555-0113");
+const ProfileMain = ({ route, navigation }) => {
+  const { name, contactEmail } = route?.params;
 
-  const [order, setOrder] = React.useState(true);
-  const [pWChange, setPWChange] = React.useState(true);
-  const [special, setSpecial] = React.useState(true);
-  const [news, setNews] = React.useState(true);
-  const [toggleCheckBox, setToggleCheckBox] = React.useState(true);
+  const [image, setImage] = React.useState("");
+
+  const [fN, onChangeFN] = React.useState(name);
+  const [lN, onChangeLN] = React.useState(" ");
+
+  const [email, onChangeEmail] = React.useState(contactEmail);
+
+  const [phone, onChangePhone] = React.useState("");
+
+  const [order, setOrder] = React.useState(false);
+  const [pWChange, setPWChange] = React.useState(false);
+  const [special, setSpecial] = React.useState(false);
+  const [news, setNews] = React.useState(false);
   const [state, setState] = React.useState({
     isLoading: true,
   });
+  const [logoutOn, setLogoutOn] = React.useState(false);
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -46,6 +56,74 @@ const TextInputExample = () => {
       setImage(result.assets[0].uri);
     }
   };
+  const handleSubmit = async () => {
+    const validRegex =
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    if (!fN) {
+      Alert.alert("First name is required");
+      return;
+    } else if (!lN) {
+      Alert.alert("Last name is required");
+      return;
+    } else if (!phone) {
+      Alert.alert("Phone Number is required");
+      return;
+    }
+    if (!email) {
+      Alert.alert("Email is required.");
+      return;
+    } else if (!email.match(validRegex)) {
+      Alert.alert("Invalid Email");
+      return;
+    }
+    const form = {
+      image,
+      fN,
+      lN,
+      email,
+      phone,
+      order,
+      pWChange,
+      special,
+      news,
+    };
+    // console.log(form);
+    await saveProfile(form);
+    navigation?.navigate("Home");
+  };
+  // console.log("image: ", image);
+  const handleLogOut = () => {
+    (async () => {
+      await cleanProfile();
+      setLogoutOn(false);
+    })();
+    // navigation?.navigate("Onboarding");
+  };
+
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const userData = await getProfile();
+        setLogoutOn(true);
+        if (userData.length) {
+          setImage(userData[0].avatar);
+          onChangeFN(userData[0].firstName);
+          onChangeLN(userData[0].lastName);
+          onChangeEmail(userData[0].email);
+          onChangePhone(userData[0].phone);
+          setOrder(userData[0].check_statues === 1 ? true : false);
+          setPWChange(userData[0].check_pw_change === 1 ? true : false);
+          setSpecial(userData[0].check_special === 1 ? true : false);
+          setNews(userData[0].check_news_letter === 1 ? true : false);
+        } else {
+          // console.log("no profile: ", profile);   //for debugging
+        }
+        // console.log("avatar at header", avatar_url);
+      } catch (e) {
+        console.error(e.message);
+      }
+    })();
+  }, []);
 
   return (
     <>
@@ -62,7 +140,7 @@ const TextInputExample = () => {
       </Text>
       <View style={styles.buttonGroup}>
         <TouchableOpacity style={styles.image} onPress={pickImage}>
-          {!image ? (
+          {image ? (
             <Image style={styles.image} source={{ uri: image }} />
           ) : (
             <>
@@ -72,18 +150,16 @@ const TextInputExample = () => {
               </Text>
             </>
           )}
-          {/* <Image style={styles.image} source={{ uri: image }} /> */}
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.buttonChange}
-          onPress={() => Alert.alert("Simple Button pressed")}
-        >
+        <TouchableOpacity style={styles.buttonChange} onPress={pickImage}>
           <Text style={styles.buttonTextChange}>Change</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.buttonRemove}
-          onPress={() => Alert.alert("Simple Button pressed")}
+          onPress={() => {
+            setImage(null);
+          }}
         >
           <Text style={styles.buttonTextRemove}>Remove</Text>
         </TouchableOpacity>
@@ -117,11 +193,13 @@ const TextInputExample = () => {
         defaultValue={phone}
         style={styles.phoneInput}
       />
+
       <Text style={[styles.bottomTitle, { paddingBottom: 15 }]}>
         Email notifications
       </Text>
       <View style={styles.checkContainer}>
         <BouncyCheckbox
+          isChecked={order}
           onPress={(isChecked) => {
             setOrder(isChecked);
           }}
@@ -134,8 +212,9 @@ const TextInputExample = () => {
       </View>
       <View style={styles.checkContainer}>
         <BouncyCheckbox
+          isChecked={pWChange}
           onPress={(isChecked) => {
-            setOrder(isChecked);
+            setPWChange(isChecked);
           }}
           innerIconStyle={{
             borderRadius: 0, // to make it a little round increase the value accordingly
@@ -146,8 +225,9 @@ const TextInputExample = () => {
       </View>
       <View style={styles.checkContainer}>
         <BouncyCheckbox
+          isChecked={special}
           onPress={(isChecked) => {
-            setOrder(isChecked);
+            setSpecial(isChecked);
           }}
           innerIconStyle={{
             borderRadius: 0, // to make it a little round increase the value accordingly
@@ -158,8 +238,9 @@ const TextInputExample = () => {
       </View>
       <View style={[styles.checkContainer, { marginBottom: 0 }]}>
         <BouncyCheckbox
+          isChecked={news}
           onPress={(isChecked) => {
-            setOrder(isChecked);
+            setNews(isChecked);
           }}
           innerIconStyle={{
             borderRadius: 0, // to make it a little round increase the value accordingly
@@ -168,23 +249,19 @@ const TextInputExample = () => {
         />
         <Text style={styles.label}>Newsletter</Text>
       </View>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => Alert.alert("Simple Button pressed")}
-      >
-        <Text style={styles.buttonText}>Log out</Text>
-      </TouchableOpacity>
-      <View style={styles.buttonGroup}>
+      {logoutOn && (
+        <TouchableOpacity style={styles.button} onPress={handleLogOut}>
+          <Text style={styles.buttonText}>Log out</Text>
+        </TouchableOpacity>
+      )}
+      <View style={[{ marginBottom: 30 }, styles.buttonGroup]}>
         <TouchableOpacity
           style={styles.buttonDiscard}
-          onPress={() => Alert.alert("Simple Button pressed")}
+          onPress={() => navigation?.navigate("Home")}
         >
           <Text style={styles.buttonTextDiscard}>Discard changes</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.buttonSave}
-          onPress={() => Alert.alert("Simple Button pressed")}
-        >
+        <TouchableOpacity style={styles.buttonSave} onPress={handleSubmit}>
           <Text style={styles.buttonTextSave}>Save changes</Text>
         </TouchableOpacity>
       </View>
@@ -192,7 +269,7 @@ const TextInputExample = () => {
   );
 };
 
-const ProfileScreen = () => {
+const ProfileScreen = ({ route, navigation }) => {
   return (
     <ScrollView
       style={[
@@ -202,7 +279,7 @@ const ProfileScreen = () => {
         },
       ]}
     >
-      <TextInputExample />
+      <ProfileMain route={route} navigation={navigation} />
     </ScrollView>
   );
 };
@@ -214,7 +291,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 95,
     height: 95,
-    backgroundColor: "#fff",
     borderRadius: 50,
     marginRight: 5,
     marginLeft: 4.5,
@@ -306,12 +382,14 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     fontSize: 20,
     color: "#374B57",
+    paddingHorizontal: 20,
   },
   input: {
     height: 40,
     borderWidth: 1,
     borderRadius: 10,
     borderColor: "#374B57",
+    paddingHorizontal: 20,
   },
   headerText: {
     fontSize: 32,

@@ -6,38 +6,50 @@ import {
   Image,
   FlatList,
   TouchableOpacity,
+  TextInput,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  ScrollView,
 } from "react-native";
-import * as SQLite from "expo-sqlite";
 import {
   createTable,
   filterByQueryAndCategories,
   getMenuItems,
   saveMenuItems,
-} from "../database";
+} from "../controller/database";
 import debounce from "lodash.debounce";
-import { getSectionListData, useUpdateEffect } from "../utils";
-
+import { getSectionListData, useUpdateEffect } from "../controller/utils";
+import { Searchbar } from "react-native-paper";
+import Filters from "./Filters";
+import { useHeaderHeight } from "@react-navigation/elements";
 const API_URL =
   "https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json";
-const db = SQLite.openDatabase("little_lemon");
-
-const HomeScreen = () => {
+const sections = ["starters", "mains", "desserts", "drinks"];
+const HomeScreen = ({ navigation }) => {
   const [data, setData] = React.useState([]);
-
+  const [searchBarText, setSearchBarText] = React.useState("");
+  const [query, setQuery] = React.useState("");
+  const [filterSelections, setFilterSelections] = React.useState(
+    sections.map(() => false)
+  );
+  const [avatar, setAvatar] = React.useState("");
   React.useEffect(() => {
+    // let T1 = getMenuItems();
+    // console.log(T1);
     //This part is a function for fetching and storing data
     (async () => {
       try {
-        await createTable();
+        await createTable("food");
 
         let menuItems = await getMenuItems();
+
         if (!menuItems.length) {
+          console.log("!menuItems.length");
           const response = await fetch(API_URL);
           const json = await response.json();
-          menuItems = json.menu.map((item) => ({
-            ...item,
-            category: item.category,
-          }));
+          menuItems = json.menu;
+
           // Storing into database
           saveMenuItems(menuItems);
         }
@@ -45,40 +57,42 @@ const HomeScreen = () => {
         // const sectionListData = getSectionListData(menuItems);
         // // console.log(JSON.stringify(sectionListData));
         // setData(sectionListData);
+        // console.log("menuItems", menuItems);
         setData(menuItems);
       } catch (e) {
         console.error(e.message);
       }
     })();
   }, []);
-  /*
-  // useUpdateEffect(() => {
-  //   (async () => {
-  //     const activeCategories = sections.filter((s, i) => {
-  //       if (filterSelections.every((item) => item === false)) {
-  //         return true;
-  //       }
-  //       return filterSelections[i];
-  //     });
-  //     try {
-  //       const menuItems = await filterByQueryAndCategories(
-  //         query,
-  //         activeCategories
-  //       );
-  //       const sectionListData = getSectionListData(menuItems);
-  //       setData(sectionListData);
-  //     } catch (e) {
-  //       console.error(e.message);
-  //     }
-  //   })();
-  // }, [filterSections, query]);
-*/
+
+  useUpdateEffect(() => {
+    (async () => {
+      const activeCategories = sections.filter((s, i) => {
+        if (filterSelections.every((item) => item === false)) {
+          return true;
+        }
+        return filterSelections[i];
+      });
+      try {
+        const menuItems = await filterByQueryAndCategories(
+          query,
+          activeCategories
+        );
+        // const sectionListData = getSectionListData(menuItems);
+        // setData(sectionListData);
+        // console.log("filtered", menuItems);
+        setData(menuItems);
+      } catch (e) {
+        console.error(e.message);
+      }
+    })();
+  }, [filterSelections, query]);
+
   const lookup = React.useCallback((q) => {
     setQuery(q);
   }, []);
-  const debouncedLookup = React.useMemo(() => {
-    debounce(lookup, 500), [lookup];
-  });
+  const debouncedLookup = React.useMemo(() => debounce(lookup, 500), [lookup]);
+
   const handleSearchChange = (text) => {
     setSearchBarText(text);
     debouncedLookup(text);
@@ -126,92 +140,100 @@ const HomeScreen = () => {
       image={item.image}
     />
   );
-
+  const height = useHeaderHeight();
+  // console.log("data", data);
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          // Try setting `flexDirection` to `"row"`.
-          flexDirection: "column",
-        },
-      ]}
+    <KeyboardAvoidingView
+      keyboardVerticalOffset={height - 164}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.searchContainer}
     >
-      <View style={{ flex: 0.48, backgroundColor: "#495E57", paddingLeft: 25 }}>
-        <Text style={styles.HeaderText}>Little Lemon</Text>
-        <View style={{ flexDirection: "row" }}>
-          <View>
-            <Text style={styles.topTextHeader}>Chicago</Text>
-            <Text style={styles.topTextP}>
-              We are a family owned{"\n"}
-              Mediterranean restaurant,{"\n"}
-              focused on traditional{"\n"}
-              recipes served with a{"\n"}
-              modern twist.
-            </Text>
+      <View
+        style={[
+          styles.container,
+          {
+            // Try setting `flexDirection` to `"row"`.
+            flexDirection: "column",
+          },
+        ]}
+      >
+        <View
+          style={{ flex: 0.45, backgroundColor: "#495E57", paddingLeft: 25 }}
+        >
+          <Text style={styles.HeaderText}>Little Lemon</Text>
+          <View style={{ flexDirection: "row" }}>
+            <View>
+              <Text style={styles.topTextHeader}>Chicago</Text>
+              <Text style={styles.topTextP}>
+                We are a family owned{"\n"}
+                Mediterranean restaurant,{"\n"}
+                focused on traditional{"\n"}
+                recipes served with a{"\n"}
+                modern twist.
+              </Text>
+            </View>
+
+            <Image
+              style={styles.titleImage}
+              source={require("../assets/handle.jpg")}
+            />
           </View>
-          <Image
-            style={styles.titleImage}
-            source={require("../assets/handle.jpg")}
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <Searchbar
+              placeholder="Search"
+              placeholderTextColor="#4D625B"
+              onChangeText={handleSearchChange}
+              value={searchBarText}
+              style={styles.searchBarStyle}
+              iconColor="#4D625B"
+              inputStyle={{ color: "#4D625B" }}
+              elevation={0}
+            />
+          </TouchableWithoutFeedback>
+        </View>
+
+        <View style={{ flex: 0.2, backgroundColor: "white" }}>
+          <Text style={styles.deliveryHeaderText}>ORDER FOR DELIVERY!</Text>
+          <Filters
+            selections={filterSelections}
+            onChange={handleFiltersChange}
+            sections={sections}
           />
         </View>
-        <Image style={styles.search} source={require("../assets/search.jpg")} />
-      </View>
-
-      <View style={{ flex: 0.2, backgroundColor: "white" }}>
-        <Text style={styles.deliveryHeaderText}>ORDER FOR DELIVERY!</Text>
         <View
           style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            padding: 15,
+            marginHorizontal: 10,
+            borderBottomColor: "black",
+            borderBottomWidth: StyleSheet.hairlineWidth,
           }}
-        >
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => Alert.alert("Simple Button pressed")}
-          >
-            <Text style={styles.buttonText}>Starters</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => Alert.alert("Simple Button pressed")}
-          >
-            <Text style={styles.buttonText}>Main</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => Alert.alert("Simple Button pressed")}
-          >
-            <Text style={styles.buttonText}>Desserts</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => Alert.alert("Simple Button pressed")}
-          >
-            <Text style={styles.buttonText}>Drinks</Text>
-          </TouchableOpacity>
+        />
+        <View style={{ flex: 0.35, backgroundColor: "white" }}>
+          <FlatList
+            data={data}
+            renderItem={renderItem}
+            keyExtractor={(item) => {
+              return item.id ? item.id : item.name;
+            }}
+          />
         </View>
       </View>
-      <View
-        style={{
-          marginHorizontal: 10,
-          borderBottomColor: "black",
-          borderBottomWidth: StyleSheet.hairlineWidth,
-        }}
-      />
-      <View style={{ flex: 0.35, backgroundColor: "white" }}>
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.name}
-        />
-      </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
+  cards: {
+    flex: 1,
+  },
+  searchBarStyle: {
+    // marginVertical: 24,
+    backgroundColor: "#EDEFEE",
+    shadowRadius: 0,
+    shadowOpacity: 0,
+    borderRadius: 10,
+    marginVertical: 10,
+    marginRight: 15,
+  },
   container: {
     flex: 1,
   },
@@ -219,7 +241,6 @@ const styles = StyleSheet.create({
     width: 135,
     height: 135,
     resizeMode: "center",
-
     marginTop: 10,
     borderRadius: 20,
     marginLeft: 10,
@@ -303,6 +324,34 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#4E625B",
     fontWeight: "bold",
+  },
+  searchContainer: {
+    flex: 1,
+  },
+  inner: {
+    padding: 24,
+    flex: 1,
+    justifyContent: "space-around",
+  },
+  header: {
+    fontSize: 36,
+    marginBottom: 48,
+  },
+  inputSearch: {
+    height: 40,
+    fontSize: 36,
+    backgroundColor: "grey",
+    color: "white",
+  },
+  textInput: {
+    height: 40,
+    borderColor: "#000000",
+    borderBottomWidth: 1,
+    marginBottom: 36,
+  },
+  btnContainer: {
+    backgroundColor: "white",
+    marginTop: 12,
   },
 });
 

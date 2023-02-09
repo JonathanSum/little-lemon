@@ -6,68 +6,98 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Alert,
   Image,
   ScrollView,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
-import headerImage from "../assets/title.png";
-const TextInputExample = () => {
-  const [email, onChangeEmail] = React.useState("");
-  const [fN, onChangeFN] = React.useState("");
+// import headerImage from "../assets/title.png";
+const Main = ({ navigation }) => {
+  const [contactEmail, onChangeContactEmail] = React.useState("");
+  const [name, onChangeName] = React.useState("");
   const [state, setState] = React.useState({
     isLoading: true,
   });
 
   return (
-    <>
-      <View style={[{ flex: 0.15 }, styles.header]}>
-        <Image style={styles.image} source={headerImage} />
-      </View>
-      <View
-        style={[
-          {
-            flex: 0.75,
-          },
-          styles.main,
-        ]}
-      >
-        <Text style={[styles.headerText, { paddingTop: 60 }]}>
-          Let us get to know you
-        </Text>
-        <Text style={[styles.text, { paddingTop: 120 }]}>First Name</Text>
-        <TextInput
-          style={[styles.input, styles.text]}
-          onChangeText={onChangeFN}
-          value={fN}
-        />
-        <Text style={[styles.text]}>Email</Text>
-        <TextInput
-          style={[styles.input, styles.text]}
-          onChangeText={onChangeEmail}
-          value={email}
-          placeholder=""
-        />
-      </View>
-      <View
-        style={[
-          {
-            flex: 0.2,
-          },
-          styles.bottom,
-        ]}
-      >
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => Alert.alert("Simple Button pressed")}
-        >
-          <Text style={styles.buttonText}>Next</Text>
-        </TouchableOpacity>
-      </View>
-    </>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <>
+          <View style={[styles.main]}>
+            <View
+              style={{
+                // flex: 0.48,
+                backgroundColor: "#495E57",
+                paddingLeft: 25,
+              }}
+            >
+              <Text style={styles.HeaderText}>Little Lemon</Text>
+              <View style={{ flexDirection: "row", paddingVertical: 30 }}>
+                <View>
+                  <Text style={styles.topTextHeader}>Chicago</Text>
+                  <Text style={styles.topTextP}>
+                    We are a family owned{"\n"}
+                    Mediterranean restaurant,{"\n"}
+                    focused on traditional{"\n"}
+                    recipes served with a{"\n"}
+                    modern twist.
+                  </Text>
+                </View>
+
+                <Image
+                  style={styles.titleImage}
+                  source={require("../assets/handle.jpg")}
+                />
+              </View>
+            </View>
+            <Text style={[styles.text, { paddingTop: 10 }]}>Name *</Text>
+            <TextInput
+              style={[styles.input, styles.text]}
+              onChangeText={onChangeName}
+              value={name}
+            />
+
+            <Text style={[styles.text]}>Email *</Text>
+            <TextInput
+              style={[styles.input, styles.text]}
+              onChangeText={onChangeContactEmail}
+              value={contactEmail}
+              placeholder=""
+            />
+          </View>
+          <View
+            style={[
+              {
+                flex: 1,
+              },
+              styles.bottom,
+            ]}
+          >
+            {name !== "" && contactEmail !== "" && (
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() =>
+                  navigation.navigate("Profile", {
+                    name: name,
+                    contactEmail: contactEmail,
+                  })
+                }
+              >
+                <Text style={styles.buttonText}>Next</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
-const Onboarding = () => {
+const Onboarding = ({ navigation }) => {
   return (
     <SafeAreaView
       style={[
@@ -77,26 +107,55 @@ const Onboarding = () => {
         },
       ]}
     >
-      <TextInputExample />
+      <Main navigation={navigation} />
     </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
   image: {},
+  titleImage: {
+    width: 135,
+    height: 135,
+    resizeMode: "center",
+    marginTop: 10,
+    borderRadius: 20,
+    marginLeft: 10,
+  },
+  HeaderText: {
+    color: "#EFCB15",
+    fontSize: 45,
+    paddingTop: 8,
+    fontFamily: "serif",
+  },
+  topTextHeader: {
+    fontFamily: "serif",
+    color: "white",
+    fontSize: 30,
+    paddingBottom: 20,
+  },
+  topText: {
+    color: "white",
+    fontSize: 20,
+  },
+  topTextP: {
+    color: "white",
+    fontSize: 17,
+  },
   text: {
-    textAlign: "center",
+    textAlign: "left",
     marginBottom: 24,
     fontSize: 28,
     color: "#374B57",
+    paddingLeft: 25,
   },
   container: {
     flex: 1,
   },
   input: {
     height: 50,
-    marginHorizontal: 40,
+    marginHorizontal: 25,
     borderWidth: 2,
-    padding: 10,
+    // padding: 10,   #here
     borderRadius: 10,
     borderColor: "#374B57",
   },
@@ -115,7 +174,7 @@ const styles = StyleSheet.create({
   bottom: {
     alignItems: "flex-end",
     justifyContent: "center",
-    backgroundColor: "#F1F4F7",
+    backgroundColor: "#DEE3E9",
   },
   button: {
     justifyContent: "center",
@@ -133,7 +192,7 @@ const styles = StyleSheet.create({
   },
   main: {
     backgroundColor: "#CBD2D9",
-    paddingBottom: 150,
+    paddingBottom: 20,
   },
 });
 export default Onboarding;
