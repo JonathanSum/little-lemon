@@ -17,17 +17,21 @@ import left from "./assets/left.png";
 import photo from "./assets/image.jpg";
 import HomeScreen from "./screens/HomeScreen";
 import { createTable, getProfile } from "./controller/database";
+import { AvatarProvider, useAvatar } from "./controller/avatar";
+// import { useTheme } from "../ThemeContext";
+
 const Stack = createNativeStackNavigator();
 
-const Back = ({ route }) => {
+const Back = ({ route, marginLeft }) => {
   // console.log("navigation of Back", navigation);
-  console.log("route of back: ", route);
+
   return (
     <View
       style={{
         flex: 0.2,
         justifyContent: "center",
         alignItems: "center",
+        marginLeft: marginLeft || 0,
       }}
     >
       <Image
@@ -43,11 +47,16 @@ export default function App() {
     isOnboardingCompleted: false,
   });
 
-  const LogoTitle = ({ props }) => {
-    console.log("Debug", props);
+  const { image, update } = useAvatar();
+  update("Yes???");
+  console.log(useAvatar());
+  const LogoTitle = () => {
     return (
-      <View style={[{ height: 90, flexDirection: "row" }, styles.header_white]}>
-        {/* <View
+      <AvatarProvider>
+        <View
+          style={[{ height: 90, flexDirection: "row" }, styles.header_white]}
+        >
+          {/* <View
         style={{
           flex: 0.2,
           justifyContent: "center",
@@ -61,23 +70,31 @@ export default function App() {
           />
         </TouchableOpacity>
       </View> */}
-        <View
-          style={{
-            flex: 0.7,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Image style={styles.image_white} source={headerImage_white} />
+          <View
+            style={{
+              flex: 0.7,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Image style={styles.image_white} source={headerImage_white} />
+          </View>
+          <View style={{ flex: 0.15, backgroundColor: "yellow" }}>
+            <Image style={styles.image_left} source={left} />
+          </View>
         </View>
-        <View style={{ flex: 0.15, backgroundColor: "yellow" }}>
-          <Image style={styles.image_left} source={left} />
-        </View>
-      </View>
+      </AvatarProvider>
     );
   };
   const LogoTitleHome = () => (
-    <View style={[{ flexDirection: "row" }, styles.headerHome]}>
+    <View
+      style={[
+        {
+          flexDirection: "row",
+        },
+        styles.headerHome,
+      ]}
+    >
       <Image style={styles.imageHome} source={headerImage_white} />
       <Image style={styles.avatar} source={photo} />
     </View>
@@ -100,14 +117,7 @@ export default function App() {
       }
     })();
   }, []);
-  const backButton = () => (
-    <TouchableOpacity
-      style={styles.button}
-      onPress={() => Alert.alert("Log out Button pressed")}
-    >
-      <Text style={styles.buttonText}>Log out</Text>
-    </TouchableOpacity>
-  );
+
   return (
     <NavigationContainer>
       {/* Onboarding completed, user is signed in */}
@@ -130,19 +140,33 @@ export default function App() {
         <Stack.Screen
           name="Home"
           component={HomeScreen}
-          options={{ headerTitle: (props) => <LogoTitleHome {...props} /> }}
+          options={({ route, navigation }) => ({
+            headerTitle: () => <LogoTitleHome />,
+            headerBackVisible: false,
+            headerLeft: () => (
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <Back route={route} marginLeft={0} />
+              </TouchableOpacity>
+            ),
+          })}
         />
         {/* User is NOT signed in */}
         <Stack.Screen
           name="Onboarding"
           component={OnboardingScreen}
-          options={{
-            headerTitle: (props) => (
+          options={({ route, navigation }) => ({
+            headerTitle: () => (
               <View style={[{ flex: 0.15 }, styles.header]}>
                 <Image style={styles.image} source={headerImage} />
               </View>
             ),
-          }}
+            headerBackVisible: false,
+            headerLeft: () => (
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <Back route={route} />
+              </TouchableOpacity>
+            ),
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>
@@ -175,23 +199,21 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   headerHome: {
-    flex: 1,
     backgroundColor: "white",
+
     alignItems: "center",
-    justifyContent: "space-around",
-    marginLeft: 80,
+    justifyContent: "flex-start",
   },
   imageHome: {
     marginVertical: 20,
     resizeMode: "contain",
     height: 50,
-    marginRight: 40,
   },
   avatar: {
     borderRadius: 50,
     height: 55,
     width: 55,
-    marginRight: 80,
+    marginRight: 50,
   },
   container: {
     flex: 1,

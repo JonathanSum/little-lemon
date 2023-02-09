@@ -1,13 +1,13 @@
 import { createContext, useContext, useState } from "react";
-const ThemeContext = createContext(undefined);
+const AvatarContext = createContext();
 
-export const avatarProvider = ({ children }) => {
-  const [image, setImage] = useState(null);
+export const AvatarProvider = ({ children }) => {
+  const [image, setImage] = useState("");
   return (
-    <ThemeContext.Provider value={{ image, clearImage: () => setImage(null) }}>
+    <AvatarContext.Provider value={{ image, update: (img) => setImage(img) }}>
       {children}
-    </ThemeContext.Provider>
+    </AvatarContext.Provider>
   );
 };
 
-export const useAvatar = () => useContext(avatarProvider);
+export const useAvatar = () => useContext(AvatarContext);
