@@ -143,7 +143,7 @@ export default function App() {
     <NavigationContainer>
       {/* Onboarding completed, user is signed in */}
       <Stack.Navigator
-        initialRouteName={state.isOnboardingCompleted ? "Onboarding" : "Home"}
+        initialRouteName={!state.isOnboardingCompleted ? "Onboarding" : "Home"}
       >
         <Stack.Screen
           name="Profile"
