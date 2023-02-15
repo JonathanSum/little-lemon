@@ -97,7 +97,7 @@ const ProfileMain = ({ route, navigation }) => {
       await cleanProfile();
       setLogoutOn(false);
     })();
-    // navigation?.navigate("Onboarding");
+    navigation?.navigate("Onboarding");
   };
 
   React.useEffect(() => {
